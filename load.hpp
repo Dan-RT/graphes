@@ -9,6 +9,36 @@
 #ifndef load_hpp
 #define load_hpp
 
+#include <iostream>
 #include <stdio.h>
+#include <fstream>
+using namespace std;
+#include <vector>
+
+
+string chooseAutomate(string number);
+int loading_graph(string id_graph);
+
+typedef struct {
+    
+    int nbTasks;
+    vector<char> nameTasks;
+    vector<int> duration;
+    
+} all_obligations;
+
+typedef struct {
+    
+    /*
+    int nb_nodes;
+    vector<vector<bool>>
+    bool** adj;
+    int** val;
+    */
+     
+} all_graph;
+
+
+void display_memory_content (all_obligations current_graph);
 
 #endif /* load_hpp */

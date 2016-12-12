@@ -7,9 +7,23 @@
 //
 
 #include <iostream>
+#include "load.hpp"
 
 int main(int argc, const char * argv[]) {
-    // insert code here...
-    std::cout << "Hello, World!\n";
+    
+    string id_graph = "";
+    
+    cout << "ENTER THE NUMBER OF YOUR GRAPH :" << endl;
+    cin >> id_graph;
+    
+    id_graph = chooseAutomate(id_graph);
+    cout << id_graph << endl;
+    
+    if (loading_graph(id_graph)) {
+        cout << "\nLoading successed" << endl;
+    } else {
+        cout << "\nLoading failed" << endl;
+    }
+    
     return 0;
 }
