@@ -93,27 +93,27 @@ int fill_graph (tt_contraintes* lesContraintes, int ligne, int colonne, bool cho
      */
     
     char tache_etudiee = lesContraintes->nomTaches[ligne];
-    //cout << "Tache etudiee : " << tache_etudiee << endl;
+    cout << "Tache etudiee : " << tache_etudiee << endl;
     
     if (lesContraintes->contraintes[tache_etudiee].size() == 0) {
-        return -1;
+        return -2;
     } else {
         
         char nom_tache_contraignante = lesContraintes->nomTaches[colonne];
-        //cout << "Tache contraignante : " << nom_tache_contraignante << endl;
+        cout << "Tache contraignante : " << nom_tache_contraignante << endl;
         
         for(vector<char>::iterator it= lesContraintes->contraintes[tache_etudiee].begin(); it!=lesContraintes->contraintes[tache_etudiee].end(); ++it) {
             
-            //cout << "Tache lue : " << *it << endl;
+            cout << "Tache lue : " << *it << endl;
             
             if (nom_tache_contraignante == *it) {
-                //cout << "Tache reconnue comme identique" << endl << endl;
+                cout << "Tache reconnue comme identique" << endl << endl;
                 //comme les taches sont effectivement liees, l'une commençant seulement quand l'autre finissant, on renvoie la duree
                 
-                return lesContraintes->durees[ligne];
+                return lesContraintes->durees[colonne];
                 
             } else {
-                //cout << "Tache differente" << endl << endl;
+                cout << "Tache differente" << endl << endl;
             }
         }
         return -1;
@@ -219,7 +219,10 @@ int loading(string id_graph)
                 int duree = fill_graph(lesContraintes, ligne, colonne, true);
                 if (duree == -1) {
                     leGraphe->adj[ligne][colonne] = false;
+                } else if (duree == -2) {
+                    leGraphe->adj[ligne][colonne] = false;
                     break;
+                    //cette condition est lorsqu'il y a aucune contrainte, on s'embête pas à tester
                 } else {
                     leGraphe->adj[ligne][colonne] = true;
                     leGraphe->val[ligne][colonne] = duree;
