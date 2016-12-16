@@ -7,9 +7,10 @@
 //
 
 #include "load.hpp"
+#include <iostream>
 
 
-string chooseAutomate(string number)  // fonction qui recupere le nom d'un fichier
+string chooseGraph(string number)  // fonction qui recupere le nom d'un fichier
 {
     string b(".txt");
     
@@ -31,10 +32,10 @@ int loading_graph(string id_graph) {
         
         for (int i = 0; i < current_graph_obligations.nbTasks; i++) {
             myStream >> data_char;
-            current_graph_obligations.nameTasks.push_back(data_char);
+            current_graph_obligations.nameTasks[i] = data_char;
             
             myStream >> data;
-            current_graph_obligations.duration.push_back(data);
+            current_graph_obligations.nameTasks[i] = data;
             
         }
         
@@ -55,8 +56,16 @@ void display_memory_content (all_obligations current_graph_obligations) {
     
     cout << "\nNumber of tasks : " << current_graph_obligations.nbTasks << endl;
     
+    map<int, string>::iterator it;
+    
+    for(it = current_graph_obligations.nameTasks.begin(); it!= current_graph_obligations.nameTasks.end(); ++it) {
+        
+        //cout << *it << " " << endl;
+    }
+    
     for (int i = 0; i < current_graph_obligations.nbTasks; i++) {
-        cout << current_graph_obligations.nameTasks[i] << " " << current_graph_obligations.duration[i] << endl;
+        
+        //cout << current_graph_obligations.nameTasks[i] << " " << current_graph_obligations.duration[i] << endl;
     }
     
 }

@@ -14,16 +14,17 @@
 #include <fstream>
 using namespace std;
 #include <vector>
+#include <map>
 
 
-string chooseAutomate(string number);
+string chooseGraph(string number);
 int loading_graph(string id_graph);
 
 typedef struct {
     
     int nbTasks;
-    vector<char> nameTasks;
-    vector<int> duration;
+    map<int, string> nameTasks;
+    map<int, int> duration;
     
 } all_obligations;
 
