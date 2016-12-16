@@ -14,13 +14,17 @@
 #include <iostream>
 #include <stdio.h>
 #include <fstream>
+#include <map>
+#include <vector>
+
 using namespace std;
 
 typedef struct {
     int nbTaches;
     char* nomTaches;
-    int *durees;
-    char*contrainte;
+    int* durees;
+    map<char, vector<char>> contraintes;
+    
 }tt_contraintes;
 
 typedef struct
@@ -31,6 +35,6 @@ typedef struct
 }tt_graphe;
 
 int loading(string id_graph);
-void ajouterContrainte(tt_contraintes* lesContraintes, char tacheCourante, char contrainteCourante);
+void ajouterContrainte(tt_contraintes* lesContraintes, char tacheCourante, char contrainteCourante, int cpt);
 
 #endif /* course_fonctions_hpp */
