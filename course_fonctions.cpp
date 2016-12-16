@@ -11,22 +11,7 @@ void ajouterContrainte(tt_contraintes* lesContraintes, char tacheCourante, char 
 }
 
 void afficher_contrainte (tt_contraintes* lesContraintes, char name_contrainte) {
-    
-    /*vector<string> tab;    //Un tableau de mots
-    
-    tab.push_back("les"); //On ajoute deux mots dans le tableau
-    tab.push_back("Zeros");
-    
-    tab.insert(tab.begin(), "Salut"); //On insère le mot "Salut" au début
-    
-    //Affiche les mots donc la chaîne "Salut les Zeros"
-    
-    for(vector<string>::iterator it=tab.begin(); it!=tab.end(); ++it)
-    {
-        cout << *it << " ";
-    }*/
-    
-    
+
     for(vector<char>::iterator it= lesContraintes->contraintes[name_contrainte].begin(); it!=lesContraintes->contraintes[name_contrainte].end(); ++it) {
         
         cout << "Test : " << name_contrainte << " ne peut commencer que lorsque la tache " << *it << " est terminee" << endl;
@@ -34,7 +19,108 @@ void afficher_contrainte (tt_contraintes* lesContraintes, char name_contrainte) 
     
 }
 
+void print_graph_bool (tt_contraintes* lesContraintes, tt_graphe* leGraphe) {
+    cout << "Graphe genere" <<endl;
+    for (int ligne = 0; ligne <= leGraphe->nbSommets - 2; ligne++)
+    {
+        cout << lesContraintes->nomTaches[ligne] << " ";
+        //cout << ligne << " ";
+        for (int colonne = 1; colonne <=leGraphe->nbSommets-2; colonne++)
+        {
+            if (ligne == 0) {
+                if (colonne == 1) {
+                    cout << " ";
+                }
+                cout << lesContraintes->nomTaches[colonne] << " ";
+                //cout << colonne << " ";
+            } else {
+                if (leGraphe->adj[ligne][colonne])
+                {
+                    cout << 1 << " ";
+                }
+                else
+                {
+                    cout << 0 << " ";
+                };
+            }
+            
+        };
+        cout <<endl;
+    };
+}
 
+void print_graph_adjacence (tt_contraintes* lesContraintes, tt_graphe* leGraphe) {
+    cout << "\n\nGraphe duree" <<endl;
+    for (int ligne = 0; ligne <= leGraphe->nbSommets - 2; ligne++)
+    {
+        cout << lesContraintes->nomTaches[ligne] << " ";
+        //cout << ligne << " ";
+        for (int colonne = 1; colonne <=leGraphe->nbSommets-2; colonne++)
+        {
+            if (ligne == 0) {
+                if (colonne == 1) {
+                    cout << " ";
+                }
+                cout << lesContraintes->nomTaches[colonne] << " ";
+                //cout << colonne << " ";
+            } else {
+                if (leGraphe->adj[ligne][colonne]) {
+                    cout << leGraphe->val[ligne][colonne] << " ";
+                }
+                else {
+                    cout << "  ";
+                };
+            }
+            
+        };
+        cout <<endl;
+    };
+}
+
+
+int fill_graph (tt_contraintes* lesContraintes, int ligne, int colonne, bool choice) {
+    
+    /*
+     Fonction pour remplir le tableau
+     
+     Dans nos structures de données les tâches sont identifiées par leur indice dans le
+     tableau (à partir de 1 et non 0. On a rempli "lesContraintes.contraintes" dans le 
+     ordre donc théoriquement il n'y a pas de soucis à utiliser les données avec ces 
+     indices
+     
+     Ligne représente la tâche étudiée, colonne la tâche potentiellement contraignante
+    
+     */
+    
+    char tache_etudiee = lesContraintes->nomTaches[ligne];
+    //cout << "Tache etudiee : " << tache_etudiee << endl;
+    
+    if (lesContraintes->contraintes[tache_etudiee].size() == 0) {
+        return -1;
+    } else {
+        
+        char nom_tache_contraignante = lesContraintes->nomTaches[colonne];
+        //cout << "Tache contraignante : " << nom_tache_contraignante << endl;
+        
+        for(vector<char>::iterator it= lesContraintes->contraintes[tache_etudiee].begin(); it!=lesContraintes->contraintes[tache_etudiee].end(); ++it) {
+            
+            //cout << "Tache lue : " << *it << endl;
+            
+            if (nom_tache_contraignante == *it) {
+                //cout << "Tache reconnue comme identique" << endl << endl;
+                //comme les taches sont effectivement liees, l'une commençant seulement quand l'autre finissant, on renvoie la duree
+                
+                return lesContraintes->durees[ligne];
+                
+            } else {
+                //cout << "Tache differente" << endl << endl;
+            }
+        }
+        return -1;
+    }
+    
+    
+}
 
 
 
@@ -70,7 +156,7 @@ int loading(string id_graph)
     
     if (myStream) {
         
-        cout << "Lecture de tableau de contrainte" << endl;
+        cout << "\nLecture de tableau de contrainte" << endl;
         
         tt_contraintes* lesContraintes = new tt_contraintes;
         char tacheCourante, contrainteCourante;
@@ -78,26 +164,25 @@ int loading(string id_graph)
         
         myStream >> lesContraintes->nbTaches;
         
-        cout<< "Nombre de taches : "<< lesContraintes->nbTaches << endl;
+        cout<< "\nNombre de taches : "<< lesContraintes->nbTaches << endl;
         lesContraintes->nomTaches = new char[lesContraintes->nbTaches+1]; // Indices 1 à nbTaches utilisés. Case 0 non utilisée
         lesContraintes->durees = new int[lesContraintes->nbTaches+1]; // Indices 1 à nbTaches utilisés. Case 0 non utilisée
         
         
         
-        cout << "durees : " << endl;
+        cout << "\ndurees : " << endl;
         for (int t = 1; t <= lesContraintes->nbTaches; t++)
         {
             myStream >> tacheCourante;
             lesContraintes->nomTaches[t] = tacheCourante;
             myStream >> dureeTache;
             lesContraintes->durees[t] = dureeTache;
-            printf("%c %2d\n", tacheCourante, lesContraintes->durees[t]);
-            cout << lesContraintes->nomTaches[t] << " " << lesContraintes->durees[t] << endl << endl;
+            //printf("%c %2d\n", tacheCourante, lesContraintes->durees[t]);
+            cout << lesContraintes->nomTaches[t] << " " << lesContraintes->durees[t] << endl;
         };
         
-        cout << endl << endl;
         
-        cout << "Contraintes : " << endl;
+        cout << "\nContraintes : " << endl;
         for (int t = 1; t <= lesContraintes->nbTaches; t++)
         {
             int cpt = 0;
@@ -128,32 +213,26 @@ int loading(string id_graph)
         {
             leGraphe->adj[ligne] = new bool[leGraphe->nbSommets +1];
             leGraphe->val[ligne] = new int[leGraphe->nbSommets +1];
+            
             for (int colonne = 1; colonne <= leGraphe->nbSommets; colonne++)
             {
-                leGraphe->adj[ligne][colonne] = false;
-            };
-        };
-        
-        
-        cout << "Graphe genere" <<endl;
-        for (int ligne = 1; ligne <= leGraphe->nbSommets; ligne++)
-        {
-            cout << ligne << " ";
-            for (int colonne = 1; colonne <=leGraphe->nbSommets; colonne++)
-            {
-                if (leGraphe->adj[ligne][colonne])
-                {
-                    cout << 1 << " ";
+                int duree = fill_graph(lesContraintes, ligne, colonne, true);
+                if (duree == -1) {
+                    leGraphe->adj[ligne][colonne] = false;
+                    break;
+                } else {
+                    leGraphe->adj[ligne][colonne] = true;
+                    leGraphe->val[ligne][colonne] = duree;
                 }
-                else
-                {
-                    cout << 0 << " ";
-                };
+                
             };
-            cout <<endl;
         };
+    
+        print_graph_bool(lesContraintes, leGraphe);
+        print_graph_adjacence(lesContraintes, leGraphe);
         
         free_memory(lesContraintes, leGraphe);
+        
         return 1;
     } else {
         return 0;
