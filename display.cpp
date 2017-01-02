@@ -80,7 +80,7 @@ void display_graph_content (vector<element> graph) {
         
         element current = *it;
         
-        cout << "Task : " << current.name << " - Duration : " << current.duration << " - Rank : " << current.rank;
+        cout << "Task : " << current.name << " - Duration : " << current.duration;
         
         cout << " - Next : ";
         

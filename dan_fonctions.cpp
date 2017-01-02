@@ -153,13 +153,10 @@ void reading_graph (vector<element> graph) {
     
 }
 
-void set_rank (vector<element> &graph_back_up, bool initialization) {
-    for(vector<element>::iterator it = graph_back_up.begin(); it != graph_back_up.end(); ++it) {
-        if (initialization) {
-            it->rank = 0;
-        } else {
-            it->rank++;
-        }
+void set_rank (map<char, element> &graph_back_up, vector<element> graph, int rank) {
+   
+    for(vector<element>::iterator it = graph.begin(); it != graph.end(); ++it) {
+        graph_back_up[it->name].rank = rank;
     }
     
 }
@@ -180,12 +177,31 @@ void rank_computation (vector<element> graph) {
     map<char, element> graph_back_up;
     create_graph_map(graph, graph_back_up);
     element* tmp = nullptr;
+    int k = 1, flag = 0;
+    vector<char> element_to_erase;  //certains éléments sont à effacer en même temps
+    map<char, char> previous_to_erase;
+    
+    
    
+    //les rangs sont déjà initialisés
     
     while (graph.size() > 0) {
+        
         for(vector<element>::iterator it = graph.begin(); it != graph.end(); ++it) {
+            //pour chaque element on regarde son nombre de previous
+            if (flag) {
+                it = graph.begin();
+                //it--;
+                flag = 0;
+            }
+            
+            
+            cout << "\nLettre testée : " << it->name << " - Size previous : " << it->previous.size() << endl;
+            
             
             if (it->previous.size() == 0) {
+                
+                //s'il n'en a pas il faut regarder tous les éléments pour lequel il est un previous
                 
                 for(vector<element>::iterator it_1 = graph.begin(); it_1 != graph.end(); ++it_1) {
                     
@@ -193,29 +209,76 @@ void rank_computation (vector<element> graph) {
                         cout << it_1->name << endl;
                         tmp = *it_2;
                         if (tmp->name == it->name) {
-                            it_1->previous.erase(it_2);
+                            previous_to_erase[it_1->name] = it->name;
+                            //it_1->previous.erase(it_2);
+                            cout << it->name << " ajouté à la suppresion des previous de " << it_1->name << endl;
                             break;
                         }
                     }
                 }
                 
-                graph.erase(it);
-                //set_rank(graph_back_up, 0);
-                cout << "\n\nGraph back-up : " << endl;
-                display_graph_map(graph_back_up);
+                element_to_erase.push_back(it->name);
+                cout << "Element " << it->name << " ajouté à la suppresion du graphe" << endl;
                 
-            }
-            if (graph.size() > 0) {
-                cout << "\n\nGraph : " << endl;
-                display_graph_content(graph);
-            } else {
-                break;
-            }
             
-            
+            }
+        }
+        cout << "Fin des lettres à tester." << endl;
+        
+        if (element_to_erase.size() > 0) {
+            for(vector<char>::iterator it = element_to_erase.begin(); it != element_to_erase.end(); ++it) {
+                //ici on supprime les elements, il peut y en avoir plusieurs en même temps
+                for(vector<element>::iterator it_1 = graph.begin(); it_1 != graph.end(); ++it_1) {
+                    if (it_1->name == *it) {
+                        cout << "\n" << it_1->name << " supprimé du graphe." << endl;
+                        graph.erase(it_1);
+                        break;
+                    }
+                }
+            }
+            element_to_erase.clear();
+            set_rank(graph_back_up, graph, k);
+            flag = 1;
         }
         
+        if (previous_to_erase.size() > 0) {
+            for(vector<element>::iterator it = graph.begin(); it != graph.end(); ++it) {
+                //on teste chaque element du graphe
+                for(map<char,char>::iterator it_char = previous_to_erase.begin(); it_char != previous_to_erase.end(); ++it_char) {
+                    //chaque element qu'on compare par rapport aux éléments ayant des previous à supprimer
+                    if (it_char->first == it->name) {
+                        for(vector<element*>::iterator it_2 = it->previous.begin(); it_2 != it->previous.end(); ++it_2) {
+                            //on parcourt les previous jusqu'à trouver le bon previous à supprimer
+                            element* tmp = *it_2;
+                            if (tmp->name == it_char->second) {
+                                cout << it_char->second << " supprimé des previous de " << it_char->first << endl;
+                                //cout << tmp->name << " supprimé des previous de " << it->name << endl;
+                                
+                                it->previous.erase(it_2);
+                                break;
+                            }
+                            tmp = nullptr;
+                        }
+                    }
+                    
+                }
+            }
+            previous_to_erase.clear();
+        }
+        
+        if (graph.size() > 0) {
+            cout << "\n\nGraph : " << endl;
+            display_graph_content(graph);
+            cout << "\n\nGraph back-up : " << endl;
+            display_graph_map(graph_back_up);
+            cout << "Fin tour n°" << k << endl;
+        } else {
+            break;
+        }
+        k++;
+        
     }
+    
     
     //delete tmp;
     tmp = nullptr;
