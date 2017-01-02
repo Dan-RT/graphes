@@ -8,6 +8,7 @@
 
 #include "dan_fonctions.hpp"
 
+void display_graph_map (map<char, element> graph_back_up);
 
 vector<element> modify_element (vector<element> graph, tt_contraintes* lesContraintes, tt_graphe* leGraphe, element* current, element* next) {
     
@@ -62,6 +63,7 @@ vector<element> fill_graph (tt_contraintes* lesContraintes, vector<element> grap
         element new_element;
         new_element.name = lesContraintes->nomTaches[i];
         new_element.duration = lesContraintes->durees[i];
+        new_element.rank = 0;
         graph.push_back(new_element);
 
         //create_element(lesContraintes->nomTaches[i], lesContraintes->durees[i], graph);
@@ -162,12 +164,24 @@ void set_rank (vector<element> &graph_back_up, bool initialization) {
     
 }
 
+
+void create_graph_map (vector<element> graph, map<char, element> &graph_back_up) {
+    
+    for(vector<element>::iterator it = graph.begin(); it != graph.end(); ++it) {
+        graph_back_up[it->name] = *it;
+    }
+}
+
+
+
 void rank_computation (vector<element> graph) {
     
-    vector<element> graph_back_up = graph;
+    //vector<element> graph_back_up = graph;
+    map<char, element> graph_back_up;
+    create_graph_map(graph, graph_back_up);
     element* tmp = nullptr;
    
-    set_rank(graph_back_up, 1);
+    
     while (graph.size() > 0) {
         for(vector<element>::iterator it = graph.begin(); it != graph.end(); ++it) {
             
@@ -186,9 +200,9 @@ void rank_computation (vector<element> graph) {
                 }
                 
                 graph.erase(it);
-                set_rank(graph_back_up, 0);
+                //set_rank(graph_back_up, 0);
                 cout << "\n\nGraph back-up : " << endl;
-                display_graph_content(graph_back_up);
+                display_graph_map(graph_back_up);
                 
             }
             if (graph.size() > 0) {

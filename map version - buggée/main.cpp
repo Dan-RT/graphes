@@ -24,12 +24,13 @@ int main(int argc, const char * argv[]) {
     element* current = nullptr;
     element* next = nullptr;
     
-    vector<element> graph;
+    map<char, element> graph;
+    
     
     id_graph = chooseGraph(id_graph);
     cout << id_graph << endl;
     
-    //if (loading_graph(id_graph)) {
+    
     if (loading(id_graph, lesContraintes, leGraphe)) {
         
         cout << "\nLoading successed" << endl;

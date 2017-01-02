@@ -74,13 +74,13 @@ void print_graph_adjacence (tt_contraintes* lesContraintes, tt_graphe* leGraphe)
 
 
 
-void display_graph_content (vector<element> graph) {
+void display_graph_content (map<char, element> graph) {
     
-    for(vector<element>::iterator it = graph.begin(); it != graph.end(); ++it) {
+    for(map<char, element>::iterator it = graph.begin(); it != graph.end(); ++it) {
         
-        element current = *it;
+        element current = it->second;
         
-        cout << "Task : " << current.name << " - Duration : " << current.duration << " - Rank : " << current.rank;
+        cout << "Task : " << current.name << " - Duration : " << current.duration << " Rank : " << current.rank;
         
         cout << " - Next : ";
         
@@ -100,34 +100,6 @@ void display_graph_content (vector<element> graph) {
     }
 }
 
-
-
-void display_graph_map (map<char, element> graph_back_up) {
-    
-    for(map<char,element>::iterator it = graph_back_up.begin(); it != graph_back_up.end(); ++it) {
-        cout << "Key : " << it->first << " Name : " << it->second.name << " - Duration : " << it->second.duration << " - Rank : " << it->second.rank;
-        
-        
-        
-        cout << " - Next : ";
-        
-        for(vector<element*>::iterator it2 = it->second.next.begin(); it2 != it->second.next.end(); ++it2) {
-            element next = **it2;
-            cout << next.name << " ";
-        }
-        
-        cout << " - Previous : ";
-        
-        for(vector<element*>::iterator it2 = it->second.previous.begin(); it2 != it->second.previous.end(); ++it2) {
-            element previous = **it2;
-            cout << previous.name << " ";
-        }
-        
-        cout << endl;
-    }
-    
-    
-}
 
 
 
