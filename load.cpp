@@ -21,7 +21,7 @@ string chooseGraph(string number)  // fonction qui recupere le nom d'un fichier
 int loading_graph(string id_graph) {
     
     all_obligations current_graph_obligations;
-    all_graph current_graph;
+    //all_graph current_graph;
     int data = 0;
     char data_char;
     

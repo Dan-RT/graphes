@@ -11,7 +11,7 @@ void ajouterContrainte(tt_contraintes* lesContraintes, char tacheCourante, char 
 }
 
 void afficher_contrainte (tt_contraintes* lesContraintes, char name_contrainte) {
-
+    
     for(vector<char>::iterator it= lesContraintes->contraintes[name_contrainte].begin(); it!=lesContraintes->contraintes[name_contrainte].end(); ++it) {
         
         cout << "Test : " << name_contrainte << " ne peut commencer que lorsque la tache " << *it << " est terminee" << endl;
@@ -19,63 +19,9 @@ void afficher_contrainte (tt_contraintes* lesContraintes, char name_contrainte) 
     
 }
 
-void print_graph_bool (tt_contraintes* lesContraintes, tt_graphe* leGraphe) {
-    cout << "Graphe genere" <<endl;
-    for (int ligne = 0; ligne <= leGraphe->nbSommets - 2; ligne++)
-    {
-        cout << lesContraintes->nomTaches[ligne] << " ";
-        //cout << ligne << " ";
-        for (int colonne = 1; colonne <=leGraphe->nbSommets-2; colonne++)
-        {
-            if (ligne == 0) {
-                if (colonne == 1) {
-                    cout << " ";
-                }
-                cout << lesContraintes->nomTaches[colonne] << " ";
-                //cout << colonne << " ";
-            } else {
-                if (leGraphe->adj[ligne][colonne])
-                {
-                    cout << 1 << " ";
-                }
-                else
-                {
-                    cout << 0 << " ";
-                };
-            }
-            
-        };
-        cout <<endl;
-    };
-}
 
-void print_graph_adjacence (tt_contraintes* lesContraintes, tt_graphe* leGraphe) {
-    cout << "\n\nGraphe duree" <<endl;
-    for (int ligne = 0; ligne <= leGraphe->nbSommets - 2; ligne++)
-    {
-        cout << lesContraintes->nomTaches[ligne] << " ";
-        //cout << ligne << " ";
-        for (int colonne = 1; colonne <=leGraphe->nbSommets-2; colonne++)
-        {
-            if (ligne == 0) {
-                if (colonne == 1) {
-                    cout << " ";
-                }
-                cout << lesContraintes->nomTaches[colonne] << " ";
-                //cout << colonne << " ";
-            } else {
-                if (leGraphe->adj[ligne][colonne]) {
-                    cout << leGraphe->val[ligne][colonne] << " ";
-                }
-                else {
-                    cout << "  ";
-                };
-            }
-            
-        };
-        cout <<endl;
-    };
-}
+
+
 
 
 int fill_graph (tt_contraintes* lesContraintes, int ligne, int colonne, bool choice) {
@@ -93,27 +39,27 @@ int fill_graph (tt_contraintes* lesContraintes, int ligne, int colonne, bool cho
      */
     
     char tache_etudiee = lesContraintes->nomTaches[ligne];
-    cout << "Tache etudiee : " << tache_etudiee << endl;
+    //cout << "Tache etudiee : " << tache_etudiee << endl;
     
     if (lesContraintes->contraintes[tache_etudiee].size() == 0) {
         return -2;
     } else {
         
         char nom_tache_contraignante = lesContraintes->nomTaches[colonne];
-        cout << "Tache contraignante : " << nom_tache_contraignante << endl;
+        //cout << "Tache contraignante : " << nom_tache_contraignante << endl;
         
         for(vector<char>::iterator it= lesContraintes->contraintes[tache_etudiee].begin(); it!=lesContraintes->contraintes[tache_etudiee].end(); ++it) {
             
-            cout << "Tache lue : " << *it << endl;
+            //cout << "Tache lue : " << *it << endl;
             
             if (nom_tache_contraignante == *it) {
-                cout << "Tache reconnue comme identique" << endl << endl;
+                //cout << "Tache reconnue comme identique" << endl << endl;
                 //comme les taches sont effectivement liees, l'une commençant seulement quand l'autre finissant, on renvoie la duree
                 
                 return lesContraintes->durees[colonne];
                 
             } else {
-                cout << "Tache differente" << endl << endl;
+                //cout << "Tache differente" << endl << endl;
             }
         }
         return -1;
@@ -123,33 +69,7 @@ int fill_graph (tt_contraintes* lesContraintes, int ligne, int colonne, bool cho
 }
 
 
-
-void free_memory (tt_contraintes* lesContraintes, tt_graphe* leGraphe) {
-    
-    delete lesContraintes->nomTaches;
-    lesContraintes->nomTaches = NULL;
-    delete lesContraintes->durees;
-    lesContraintes->durees = NULL;
-    delete lesContraintes;
-    lesContraintes = NULL;
-    
-    for (int ligne = 1; ligne <= leGraphe->nbSommets; ligne++)
-    {
-        delete leGraphe->adj[ligne];
-        leGraphe->adj[ligne] = NULL;
-        delete leGraphe->val[ligne];
-        leGraphe->val[ligne] = NULL;
-        
-    };
-    
-    delete leGraphe;
-    leGraphe = NULL;
-    
-    cout << "\n\nMemory freed." <<endl;
-}
-
-
-int loading(string id_graph)
+int loading(string id_graph, tt_contraintes* lesContraintes, tt_graphe* leGraphe)
 {
     
     ifstream myStream (id_graph, ios::in);
@@ -158,9 +78,10 @@ int loading(string id_graph)
         
         cout << "\nLecture de tableau de contrainte" << endl;
         
-        tt_contraintes* lesContraintes = new tt_contraintes;
+        
         char tacheCourante, contrainteCourante;
-        int indiceTacheCourante, dureeTache;
+        //int indiceTacheCourante;
+        int dureeTache;
         
         myStream >> lesContraintes->nbTaches;
         
@@ -201,7 +122,7 @@ int loading(string id_graph)
         
         cout << endl << endl;
         
-        tt_graphe* leGraphe =  new tt_graphe;
+        
         leGraphe->nbSommets = lesContraintes->nbTaches+2;
         // début = lesContraintes->nbTaches+1
         // fin = lesContraintes->nbTaches+2
@@ -222,19 +143,15 @@ int loading(string id_graph)
                 } else if (duree == -2) {
                     leGraphe->adj[ligne][colonne] = false;
                     break;
-                    //cette condition est lorsqu'il y a aucune contrainte, on s'embête pas à tester
+                    //cette condition est lorsqu'il y a aucune contrainte, on s'embête pas à tester toutes les colonnes
                 } else {
                     leGraphe->adj[ligne][colonne] = true;
                     leGraphe->val[ligne][colonne] = duree;
                 }
-                
             };
         };
     
-        print_graph_bool(lesContraintes, leGraphe);
-        print_graph_adjacence(lesContraintes, leGraphe);
-        
-        free_memory(lesContraintes, leGraphe);
+        //print_graph_adjacence_reverse(lesContraintes, leGraphe);
         
         return 1;
     } else {
@@ -242,4 +159,54 @@ int loading(string id_graph)
     }
     
 }
+
+
+
+
+
+
+
+
+void bellman (tt_graphe* leGraphe) {
+    
+    //initialisation
+    
+    
+    
+    //développement
+    for (int i = 0; i < leGraphe->nbSommets-1; i++) {
+        
+        
+        
+        
+        
+    }
+    
+    
+    //détection de boucles
+    
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

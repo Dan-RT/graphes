@@ -9,8 +9,6 @@
 #ifndef course_fonctions_hpp
 #define course_fonctions_hpp
 
-#include <stdio.h>
-
 #include <iostream>
 #include <stdio.h>
 #include <fstream>
@@ -34,7 +32,8 @@ typedef struct
     int** val;
 }tt_graphe;
 
-int loading(string id_graph);
+int loading(string id_graph, tt_contraintes* lesContraintes, tt_graphe* leGraphe);
 void ajouterContrainte(tt_contraintes* lesContraintes, char tacheCourante, char contrainteCourante, int cpt);
+
 
 #endif /* course_fonctions_hpp */
