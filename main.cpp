@@ -51,6 +51,7 @@ int main(int argc, const char * argv[]) {
         rank_computation(graph, graph_back_up);
         set_graph_cresc(graph_back_up, graph_cresc);
         set_earliest_date(graph_cresc);
+        display_graph_cresc(graph_cresc);
         display_earliest_dates(graph_cresc);
         free_memory(lesContraintes, leGraphe, graph, current, next);
         

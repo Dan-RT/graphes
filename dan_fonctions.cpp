@@ -67,6 +67,8 @@ vector<element> fill_graph (tt_contraintes* lesContraintes, vector<element> grap
         new_element.rank = 0;
         new_element.earliest_date = 0;
         new_element.latest_date = 0;
+        new_element.sum_e_date_duration = 0;
+        new_element.simultaneous = false;
         graph.push_back(new_element);
 
         //create_element(lesContraintes->nomTaches[i], lesContraintes->durees[i], graph);
@@ -156,114 +158,8 @@ void reading_graph (vector<element> graph) {
     
 }
 
-void set_rank (map<char, element> &graph_back_up, vector<element> graph, int rank) {
-   
-    for(vector<element>::iterator it = graph.begin(); it != graph.end(); ++it) {
-        graph_back_up[it->name].rank = rank;
-    }
-    
-}
 
 
-
-void set_graph_cresc (map<char, element> graph_back_up, multimap<int, element> &graph_cresc) {
-    
-    for(map<char,element>::iterator it = graph_back_up.begin(); it != graph_back_up.end(); ++it) {
-        graph_cresc.insert(pair<int,element>(it->second.rank,it->second));
-        //la création d'un élément map ou multimap ici (besoin d'autoriser des doublons au niveau des clés) met tout seul en ordre de croissant les éléments
-    }
-    
-}
-
-
-
-void set_earliest_date (multimap<int, element> &graph_cresc) {
-    int e_date_i = 0, duration_i = 0;
-    
-    for(multimap<int,element>::iterator it = graph_cresc.begin(); it != graph_cresc.end(); ++it) {
-        
-        if (it == graph_cresc.begin()) {
-            it->second.earliest_date = 0;
-            e_date_i = 0;
-            duration_i = it->second.duration;
-        } else {
-            it->second.earliest_date = e_date_i + duration_i;
-            e_date_i = it->second.earliest_date;
-            duration_i = it->second.duration;
-        }
-    
-    }
-}
-
-void set_latest_date (multimap<int, element> &graph_cresc) {
-    int e_date_i = 0, duration_i = 0;
-    
-    for(multimap<int,element>::iterator it = graph_cresc.end(); it != graph_cresc.begin(); ++it) {
-        
-        if (it == graph_cresc.begin()) {
-            it->second.earliest_date = 0;
-            e_date_i = 0;
-            duration_i = it->second.duration;
-        } else {
-            it->second.earliest_date = e_date_i + duration_i;
-            e_date_i = it->second.earliest_date;
-            duration_i = it->second.duration;
-        }
-        
-    }
-}
-
-void display_earliest_dates (multimap<int, element> &graph_cresc) {
-    
-    int cpt = 0, previous_end = 0;
-    
-    cout << endl << endl << "Dates au plus tôt : " << endl << endl;
-    
-    for(multimap<int,element>::iterator it = graph_cresc.begin(); it != graph_cresc.end(); ++it) {
-        
-        if (it->second.name == 'G') {
-            //test
-        }
-        if (it == graph_cresc.begin()) {
-            it = graph_cresc.end();
-            it--;
-            cout << " ";
-            cpt = it->second.earliest_date;
-            for (int i = 0; i <= cpt; i++) {
-                if (i < 10) {
-                    cout << "  " << i << "  ";
-                } else {
-                    cout << "  " << i << " ";
-                }
-                
-            }
-            cout << endl;
-            it = graph_cresc.begin();
-            
-            previous_end = 0;
-            /*
-            for (int i = 0; i < cpt; i++) {
-                if (i > previous_end && i < previous_end+it->second.duration) {
-                    cout << "|==|" << endl;
-                } else {
-                    cout << "|  |" << endl;
-                }
-            }
-            previous_end = previous_end+it->second.duration;*/
-            
-        }
-        cout << it->second.name;
-        for (int i = 0; i <= cpt; i++) {
-            if (i >= previous_end && i < previous_end+it->second.duration) {
-                cout << "|===|";
-            } else {
-                cout << "|   |";
-            }
-        }
-        cout << endl;
-        previous_end = previous_end+it->second.duration;
-    }
-}
 
 void create_graph_map (vector<element> graph, map<char, element> &graph_back_up) {
     
@@ -273,6 +169,13 @@ void create_graph_map (vector<element> graph, map<char, element> &graph_back_up)
 }
 
 
+void set_rank (map<char, element> &graph_back_up, vector<element> graph, int rank) {
+    
+    for(vector<element>::iterator it = graph.begin(); it != graph.end(); ++it) {
+        graph_back_up[it->name].rank = rank;
+    }
+    
+}
 
 void rank_computation (vector<element> graph, map<char, element> &graph_back_up) {
     
@@ -390,6 +293,97 @@ void rank_computation (vector<element> graph, map<char, element> &graph_back_up)
 
 
 
+
+
+void set_graph_cresc (map<char, element> graph_back_up, multimap<int, element> &graph_cresc) {
+    
+    for(map<char,element>::iterator it = graph_back_up.begin(); it != graph_back_up.end(); ++it) {
+        graph_cresc.insert(pair<int,element>(it->second.rank,it->second));
+        //la création d'un élément map ou multimap ici (besoin d'autoriser des doublons au niveau des clés) met tout seul en ordre de croissant les éléments
+    }
+}
+
+void set_latest_date (multimap<int, element> &graph_cresc) {
+    int e_date_i = 0, duration_i = 0;
+    
+    for(multimap<int,element>::iterator it = graph_cresc.end(); it != graph_cresc.begin(); ++it) {
+        
+        if (it == graph_cresc.begin()) {
+            it->second.earliest_date = 0;
+            e_date_i = 0;
+            duration_i = it->second.duration;
+        } else {
+            it->second.earliest_date = e_date_i + duration_i;
+            e_date_i = it->second.earliest_date;
+            duration_i = it->second.duration;
+        }
+        
+    }
+}
+
+
+void modify_element_graph_resc (multimap<int, element> &graph_cresc, char letter, int sum, int rank, int earliest_date) {
+    
+    //cette fonction parcours les previous pour le tableau d'element classé par rang, comme on est pas dynamique sur les éléments il faut qu'on aille sur chaque previous modifier tout ça
+    
+    element* current = nullptr;
+    
+    for(multimap<int,element>::iterator it = graph_cresc.begin(); it != graph_cresc.end(); ++it) {
+        //on parcourt chaque élément du graphe
+        
+        for(vector<element*>::iterator it_1 = it->second.previous.begin(); it_1 != it->second.previous.end(); ++it_1) {
+            //puis chaque previous
+            current = *it_1;
+            if (current->name == letter) {
+                //on regarde s'il a pour previous un element du même nom que la lettre testée, si oui, on set la sum_e_date_duration avec value
+                current->sum_e_date_duration = sum;
+                current->rank = rank;
+                current->earliest_date = earliest_date;
+                
+            }
+            current = nullptr;
+        }
+    }
+}
+
+
+
+
+
+void set_earliest_date (multimap<int, element> &graph_cresc) {
+    
+    vector<int> tmp;
+    element* current = nullptr;
+    
+    for(multimap<int,element>::iterator it = graph_cresc.begin(); it != graph_cresc.end(); ++it) {
+        
+        //if (it == graph_cresc.begin()) {
+        if (it->second.rank == 0) {
+            it->second.earliest_date = 0;
+            
+            it->second.sum_e_date_duration = it->second.earliest_date+it->second.duration;
+            modify_element_graph_resc(graph_cresc, it->second.name, it->second.sum_e_date_duration, it->second.rank, it->second.earliest_date);
+            
+        } else {
+            
+            for(vector<element*>::iterator it_1 = it->second.previous.begin(); it_1 != it->second.previous.end(); ++it_1) {
+                current = *it_1;
+                tmp.push_back(current->sum_e_date_duration);
+            }
+            sort(tmp.begin(), tmp.end());
+            
+            for (int i = 0; i < tmp.size(); i++) {
+                it->second.earliest_date = tmp[i];
+            }
+            it->second.sum_e_date_duration = it->second.earliest_date+it->second.duration;
+            modify_element_graph_resc(graph_cresc, it->second.name, it->second.sum_e_date_duration, it->second.rank, it->second.earliest_date);
+        }
+        tmp.clear();
+    }
+    
+    cout << "test" << endl;
+    
+}
 
 
 

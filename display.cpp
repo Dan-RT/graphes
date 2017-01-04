@@ -130,4 +130,75 @@ void display_graph_map (map<char, element> graph_back_up) {
 }
 
 
+void display_graph_cresc (multimap<int, element> &graph_cresc) {
+
+    for(multimap<int,element>::iterator it = graph_cresc.begin(); it != graph_cresc.end(); ++it) {
+        cout << "Key : " << it->first << " Name : " << it->second.name << " - Duration : " << it->second.duration << " - Rank : " << it->second.rank;
+        
+        
+        
+        cout << " - Next : ";
+        
+        for(vector<element*>::iterator it2 = it->second.next.begin(); it2 != it->second.next.end(); ++it2) {
+            element next = **it2;
+            cout << next.name << " ";
+        }
+        
+        cout << " - Previous : ";
+        
+        for(vector<element*>::iterator it2 = it->second.previous.begin(); it2 != it->second.previous.end(); ++it2) {
+            element previous = **it2;
+            cout << previous.name << " ";
+        }
+        
+        cout << endl;
+    }
+
+}
+
+void display_earliest_dates (multimap<int, element> &graph_cresc) {
+    
+    int cpt = 0;
+    
+    cout << endl << endl << "Dates au plus tôt : " << endl << endl;
+    
+    for(multimap<int,element>::iterator it = graph_cresc.begin(); it != graph_cresc.end(); ++it) {
+        
+        if (it == graph_cresc.begin()) {
+            while (it != graph_cresc.end()) {
+                if (it->second.sum_e_date_duration > cpt) {
+                    cpt = it->second.sum_e_date_duration;
+                }
+                it++;
+            }
+            //it = graph_cresc.end();
+            //it--;
+            cout << " ";
+            for (int i = 1; i < cpt; i++) {
+                if (i < 10) {
+                    cout << "  " << i << "  ";
+                } else {
+                    cout << " " << i << "  ";
+                }
+                
+            }
+            cout << endl;
+            it = graph_cresc.begin();
+        }
+        
+        cout << it->second.name;
+        for (int i = 1; i < cpt; i++) {
+            
+            if (i >= it->second.earliest_date && i < it->second.earliest_date+it->second.duration) {
+                cout << "|===|";
+            } else {
+                cout << "|   |";
+            }
+        }
+        cout << endl;
+    }
+}
+
+
+
 
