@@ -53,6 +53,12 @@ int main(int argc, const char * argv[]) {
         set_earliest_date(graph_cresc);
         display_graph_cresc(graph_cresc);
         display_earliest_dates(graph_cresc);
+        
+        set_latest_date(graph_cresc);
+        display_latest_dates(graph_cresc);
+        
+        cout << "Test" << endl;
+        
         free_memory(lesContraintes, leGraphe, graph, current, next);
         
         

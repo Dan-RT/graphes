@@ -68,10 +68,9 @@ vector<element> fill_graph (tt_contraintes* lesContraintes, vector<element> grap
         new_element.earliest_date = 0;
         new_element.latest_date = 0;
         new_element.sum_e_date_duration = 0;
-        new_element.simultaneous = false;
+        new_element.diff_l_date_duration = 0;
+        new_element.sum_l_date_duration = 0;
         graph.push_back(new_element);
-
-        //create_element(lesContraintes->nomTaches[i], lesContraintes->durees[i], graph);
     }
     
     return graph;
@@ -122,12 +121,16 @@ int scan_graph (vector<element> graph, element* current) {
     cout << current->name;
     
     for(vector<element*>::iterator it = current->next.begin(); it != current->next.end(); ++it) {
+        element* tmp =nullptr;
+        
         scan_graph(graph, *it);
         cout << "." << endl;
+        tmp =nullptr;
     }
     
     return 0;
 }
+
 
 
 void reading_graph (vector<element> graph) {
@@ -185,9 +188,9 @@ void rank_computation (vector<element> graph, map<char, element> &graph_back_up)
     element* tmp = nullptr;
     int k = 1, flag = 0;
     vector<char> element_to_erase;  //certains éléments sont à effacer en même temps
-    map<char, char> previous_to_erase;
+    multimap<char, char> previous_to_erase;
     
-    
+    int test = 0;
    
     //les rangs sont déjà initialisés
     
@@ -215,7 +218,11 @@ void rank_computation (vector<element> graph, map<char, element> &graph_back_up)
                         cout << it_1->name << endl;
                         tmp = *it_2;
                         if (tmp->name == it->name) {
-                            previous_to_erase[it_1->name] = it->name;
+                            if (it->name == '7') {
+                                test = 1;
+                            }
+                            previous_to_erase.insert(pair<char, char>(it_1->name,it->name));
+                            //previous_to_erase[it_1->name] = it->name;
                             //it_1->previous.erase(it_2);
                             cout << it->name << " ajouté à la suppresion des previous de " << it_1->name << endl;
                             break;
@@ -226,10 +233,13 @@ void rank_computation (vector<element> graph, map<char, element> &graph_back_up)
                 element_to_erase.push_back(it->name);
                 cout << "Element " << it->name << " ajouté à la suppresion du graphe" << endl;
                 
-            
+                
             }
         }
         cout << "Fin des lettres à tester." << endl;
+        if (test) {
+            cout << "test" << endl;
+        }
         
         if (element_to_erase.size() > 0) {
             for(vector<char>::iterator it = element_to_erase.begin(); it != element_to_erase.end(); ++it) {
@@ -303,25 +313,6 @@ void set_graph_cresc (map<char, element> graph_back_up, multimap<int, element> &
     }
 }
 
-void set_latest_date (multimap<int, element> &graph_cresc) {
-    int e_date_i = 0, duration_i = 0;
-    
-    for(multimap<int,element>::iterator it = graph_cresc.end(); it != graph_cresc.begin(); ++it) {
-        
-        if (it == graph_cresc.begin()) {
-            it->second.earliest_date = 0;
-            e_date_i = 0;
-            duration_i = it->second.duration;
-        } else {
-            it->second.earliest_date = e_date_i + duration_i;
-            e_date_i = it->second.earliest_date;
-            duration_i = it->second.duration;
-        }
-        
-    }
-}
-
-
 void modify_element_graph_resc (multimap<int, element> &graph_cresc, char letter, int sum, int rank, int earliest_date) {
     
     //cette fonction parcours les previous pour le tableau d'element classé par rang, comme on est pas dynamique sur les éléments il faut qu'on aille sur chaque previous modifier tout ça
@@ -347,7 +338,33 @@ void modify_element_graph_resc (multimap<int, element> &graph_cresc, char letter
 }
 
 
-
+void modify_element_graph_resc (multimap<int, element> &graph_cresc, int early_date, char letter, int date_limit, int sum) {
+    
+    //surcharge de la fonction d'avant
+    
+    element* current = nullptr;
+    
+    for(multimap<int,element>::iterator it = graph_cresc.begin(); it != graph_cresc.end(); ++it) {
+        //on parcourt chaque élément du graphe
+        
+        for(vector<element*>::iterator it_1 = it->second.next.begin(); it_1 != it->second.next.end(); ++it_1) {
+            
+            if (it->second.name=='7') {
+                cout << "test" << endl;
+            }
+                
+            //puis chaque next
+            current = *it_1;
+            if (current->name == letter) {
+                //on regarde s'il a pour previous un element du même nom que la lettre testée, si oui, on set la sum_e_date_duration avec value
+                current->earliest_date = early_date;
+                current->latest_date = date_limit;
+                current->sum_l_date_duration = sum;
+            }
+            current = nullptr;
+        }
+    }
+}
 
 
 void set_earliest_date (multimap<int, element> &graph_cresc) {
@@ -380,11 +397,44 @@ void set_earliest_date (multimap<int, element> &graph_cresc) {
         }
         tmp.clear();
     }
-    
-    cout << "test" << endl;
-    
 }
 
+void set_latest_date (multimap<int, element> &graph_cresc) {
+    
+    vector<int> tmp;
+    element* current = nullptr;
+    int difference = 0;
+    
+    for(multimap<int,element>::iterator it = graph_cresc.end(); it != graph_cresc.begin(); --it) {
+        //on parcourt tout les éléments de la fin vers le début
+        
+        if (it != graph_cresc.end()) {
+            //pour éviter un bad access, faut pas aller trop loin
+            
+            if (it->second.name == '9') {
+                cout << "test" << endl;
+            }
+            
+            for(vector<element*>::iterator it_1 = it->second.next.begin(); it_1 != it->second.next.end(); ++it_1) {
+                //on regarde les next de l'élément
+                current = *it_1;
+                difference = current->earliest_date - it->second.duration;
+                tmp.push_back(difference);
+                current = nullptr;
+            }
+            sort(tmp.begin(), tmp.end());
+            
+            if (tmp.size() > 0) {
+                it->second.latest_date = tmp[0];
+            } else {
+                it->second.latest_date = it->second.earliest_date;
+            }
+            
+            it->second.sum_l_date_duration = it->second.latest_date + it->second.duration;
+            modify_element_graph_resc(graph_cresc, it->second.earliest_date, it->second.name, it->second.latest_date, it->second.sum_l_date_duration);
+        }
+    }
+}
 
 
 

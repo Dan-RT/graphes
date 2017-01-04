@@ -16,13 +16,15 @@ typedef struct element element;
 struct element {
     char name;
     int duration;
+    bool flag;
     int rank;
     vector<element*> previous;
     vector<element*> next;
     int earliest_date;
     int sum_e_date_duration;
     int latest_date;
-    bool simultaneous;
+    int diff_l_date_duration;
+    int sum_l_date_duration;
 };
 
 
@@ -41,5 +43,6 @@ void rank_computation (vector<element> graph, map<char, element> &graph_back_up)
 void set_graph_cresc (map<char, element> graph_back_up, multimap<int, element> &graph_cresc);
 void set_earliest_date (multimap<int, element> &graph_cresc);
 void display_graph_cresc (multimap<int, element> &graph_cresc);
-
+void set_latest_date (multimap<int, element> &graph_cresc);
+void display_latest_dates (multimap<int, element> &graph_cresc);
 #endif /* dan_fonctions_hpp */

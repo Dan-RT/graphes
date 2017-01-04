@@ -200,5 +200,47 @@ void display_earliest_dates (multimap<int, element> &graph_cresc) {
 }
 
 
+void display_latest_dates (multimap<int, element> &graph_cresc) {
+    
+    int cpt = 0;
+    
+    cout << endl << endl << "Dates au plus tard : " << endl << endl;
+    
+    for(multimap<int,element>::iterator it = graph_cresc.begin(); it != graph_cresc.end(); ++it) {
+        
+        if (it == graph_cresc.begin()) {
+            while (it != graph_cresc.end()) {
+                if (it->second.sum_l_date_duration > cpt) {
+                    cpt = it->second.sum_l_date_duration;
+                }
+                it++;
+            }
+            cout << " ";
+            for (int i = 1; i < cpt; i++) {
+                if (i < 10) {
+                    cout << "  " << i << "  ";
+                } else {
+                    cout << " " << i << "  ";
+                }
+                
+            }
+            cout << endl;
+            it = graph_cresc.begin();
+        }
+        
+        cout << it->second.name;
+        for (int i = 0; i < cpt; i++) {
+            
+            if (i >= it->second.latest_date && i < it->second.sum_l_date_duration) {
+                cout << "|===|";
+            } else {
+                cout << "|   |";
+            }
+        }
+        cout << endl;
+    }
+}
+
+
 
 
