@@ -48,6 +48,8 @@ int main(int argc, const char * argv[]) {
         //display_graph_content(graph);
         //reading_graph(graph);
         
+        reading_graph(graph);
+        
         rank_computation(graph, graph_back_up);
         set_graph_cresc(graph_back_up, graph_cresc);
         set_earliest_date(graph_cresc);

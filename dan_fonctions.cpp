@@ -119,47 +119,132 @@ void free_memory (tt_contraintes* lesContraintes, tt_graphe* leGraphe, vector<el
 int scan_graph (vector<element> graph, element* current) {
     
     cout << current->name;
+    current->flag = true;
     
     for(vector<element*>::iterator it = current->next.begin(); it != current->next.end(); ++it) {
         element* tmp =nullptr;
-        
-        scan_graph(graph, *it);
-        cout << "." << endl;
-        tmp =nullptr;
+        tmp = *it;
+        if (tmp->flag == true) {
+            cout << "circuit?" << endl;
+            tmp =nullptr;
+            //exit(0);
+            break;
+        } else {
+            tmp->flag = true;
+            scan_graph(graph, *it);
+            cout << "." << endl;
+            tmp =nullptr;
+        }
     }
     
     return 0;
 }
 
+void set_flag_false (vector<element> &graph, element* current) {
+    
+    for (int i = 0; i < current->next.size(); i++) {
+        current->flag = false;
+        set_flag_false(graph, current->next[i]);
+    }
+    
+}
 
+void delete_circuit (vector<element> &graph, char depart, char destination) {
+    
+    for(vector<element>::iterator it = graph.begin(); it != graph.end(); ++it) {
+        if (depart == it->name) {
+            for(vector<element*>::iterator it_1 = it->next.begin(); it_1 != it->next.end(); ++it_1) {
+                
+                element* tmp = *it_1;
+                cout << "Suppression de l'élément " << tmp->name << " de la liste des next de " << it->name << endl;
+                if (tmp->name == destination) {
+                    it->next.erase(it_1);
+                }
+                tmp = nullptr;
+            }
+        }
+        
+        if (destination == it->name) {
+            for(vector<element*>::iterator it_1 = it->previous.begin(); it_1 != it->previous.end(); ++it_1) {
+                
+                element* tmp = *it_1;
+                cout << "Suppression de l'élément " << tmp->name << " de la liste des previous de " << it->name << endl;
+                if (tmp->name == destination) {
+                    it->previous.erase(it_1);
+                }
+                tmp = nullptr;
+            }
+        }
+    }
+    
+}
+
+int circuit (vector<element> &graph, element* first, element* current, element* previous) {
+    
+    cout << current->name << endl;
+    for (int i = 0; i < current->next.size(); i++) {
+        if (i != 0) {
+            if (current->next.size() > 0) {
+                //set_flag_false(graph, current->next[i], i);
+            }
+        }
+        
+        if (current->flag == true && i == 0) {
+            cout << current->name << endl;
+        
+            cout << "Circuit détecté. " << endl;
+            exit(0);
+            delete_circuit(graph, previous->name, current->name);
+            
+        } else {
+            current->flag = true;
+            circuit(graph, first, current->next[i], current);
+            cout << "." << endl;
+        }
+        set_flag_false(graph, current->next[i]);
+    }
+    
+    return 0;
+}
 
 void reading_graph (vector<element> graph) {
     
     //determiner qui est le premier, le premier element est un élément sans previous
-    element test;
-    element* first = nullptr;
+    element* test;
+    element* first;
+    int flag = 0;
     
     for(vector<element>::iterator it = graph.begin(); it != graph.end(); ++it) {
-        test = *it;
-        if (test.previous.size() == 0) {
+        test = &*it;
+        if (test->previous.size() == 0) {
             first = &*it;
-            break;
+            flag = 1;
+            
+            cout << "First element : " << first->name << endl;
+            circuit(graph, first, first, first);
         }
     }
-    if (first == nullptr) {
+    if (flag == 0) {
         cout << "No starting element." << endl;
         exit(0);
     }
     
-    cout << "First element : " << first->name << endl;
     
     
-    cout << "Liste of paths : " << endl;
-    scan_graph(graph, first);
+    
+    
+    
+    //scan_graph(graph, first);
     
     //delete first;
     
 }
+
+
+
+
+
+
 
 
 
