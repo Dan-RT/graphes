@@ -12,6 +12,8 @@
 #include "display.hpp"
 #include "dan_fonctions.hpp"
 
+void display_earliest_dates (multimap<int, element> &graph_cresc);
+
 int main(int argc, const char * argv[]) {
    
     string id_graph = "";
@@ -25,6 +27,8 @@ int main(int argc, const char * argv[]) {
     element* next = nullptr;
     
     vector<element> graph;
+    map<char, element> graph_back_up;
+    multimap<int, element> graph_cresc;
     
     id_graph = chooseGraph(id_graph);
     cout << id_graph << endl;
@@ -44,9 +48,13 @@ int main(int argc, const char * argv[]) {
         //display_graph_content(graph);
         //reading_graph(graph);
         
-        rank_computation(graph);
-        
+        rank_computation(graph, graph_back_up);
+        set_graph_cresc(graph_back_up, graph_cresc);
+        set_earliest_date(graph_cresc);
+        display_earliest_dates(graph_cresc);
         free_memory(lesContraintes, leGraphe, graph, current, next);
+        
+        
         
     } else {
         cout << "\nLoading failed" << endl;

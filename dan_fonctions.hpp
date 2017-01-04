@@ -19,7 +19,13 @@ struct element {
     int rank;
     vector<element*> previous;
     vector<element*> next;
+    int earliest_date;
+    int latest_date;
 };
+
+
+
+
 
 
 vector<element> fill_graph (tt_contraintes* lesContraintes, vector<element> graph,tt_graphe* leGraphe);
@@ -29,6 +35,9 @@ vector<element> modify_element (vector<element> graph, tt_contraintes* lesContra
 void free_memory (tt_contraintes* lesContraintes, tt_graphe* leGraphe, vector<element> graph, element* current, element* next);
 void reading_graph (vector<element> graph);
 int scan_graph (vector<element> graph, element* current);
-void rank_computation (vector<element> graph);
+void rank_computation (vector<element> graph, map<char, element> &graph_back_up);
+void set_graph_cresc (map<char, element> graph_back_up, multimap<int, element> &graph_cresc);
+void set_earliest_date (multimap<int, element> &graph_cresc);
+
 
 #endif /* dan_fonctions_hpp */
