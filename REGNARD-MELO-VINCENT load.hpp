@@ -31,12 +31,12 @@ typedef struct {
 typedef struct {
     
     /*
-     int nb_nodes;
-     vector<vector<bool>>
-     bool** adj;
-     int** val;
-     */
-    
+    int nb_nodes;
+    vector<vector<bool>>
+    bool** adj;
+    int** val;
+    */
+     
 } all_graph;
 
 

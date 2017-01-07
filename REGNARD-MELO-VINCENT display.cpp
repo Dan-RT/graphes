@@ -11,7 +11,7 @@
 
 
 void print_graph_bool (tt_contraintes* lesContraintes, tt_graphe* leGraphe) {
-    cout << "Graphe genere : \n" << endl;
+    cout << "Graphe genere" << endl;
     
     for (int ligne = 0; ligne <= leGraphe->nbSommets - 2; ligne++)
     {
@@ -43,7 +43,7 @@ void print_graph_bool (tt_contraintes* lesContraintes, tt_graphe* leGraphe) {
 
 
 void print_graph_adjacence (tt_contraintes* lesContraintes, tt_graphe* leGraphe) {
-    cout << "\n\nMatrice d'adjacence : \n" <<endl;
+    cout << "\n\nGraphe duree" <<endl;
     for (int ligne = 0; ligne <= leGraphe->nbSommets - 2; ligne++)
     {
         cout << lesContraintes->nomTaches[ligne] << " ";
@@ -156,12 +156,11 @@ void display_graph_cresc (multimap<int, element> &graph_cresc) {
 
 }
 
-
 void display_earliest_dates (multimap<int, element> &graph_cresc) {
     
     int cpt = 0;
     
-    cout << "\n\n-----------------DATES AU PLUS TOT-----------------\n" << endl;
+    cout << endl << endl << "Dates au plus tôt : " << endl << endl;
     
     for(multimap<int,element>::iterator it = graph_cresc.begin(); it != graph_cresc.end(); ++it) {
         
@@ -205,13 +204,7 @@ void display_latest_dates (multimap<int, element> &graph_cresc) {
     
     int cpt = 0;
     
-    cout << "\n" << endl;
-    /*
-    for(multimap<int,element>::iterator it = graph_cresc.begin(); it != graph_cresc.end(); ++it) {
-        cout << "Name : " << it->second.name << " - Date + tard : " << it->second.latest_date << endl;
-    }*/
-    
-    cout << "\n\n-----------------DATES AU PLUS TARD-----------------\n" << endl;
+    cout << endl << endl << "Dates au plus tard : " << endl << endl;
     
     for(multimap<int,element>::iterator it = graph_cresc.begin(); it != graph_cresc.end(); ++it) {
         
@@ -236,7 +229,7 @@ void display_latest_dates (multimap<int, element> &graph_cresc) {
         }
         
         cout << it->second.name;
-        for (int i = 0; i < cpt-1; i++) {
+        for (int i = 0; i < cpt; i++) {
             
             if (i >= it->second.latest_date && i < it->second.sum_l_date_duration) {
                 cout << "|===|";

@@ -14,15 +14,11 @@
 
 void display_earliest_dates (multimap<int, element> &graph_cresc);
 
-string chooseGraph(string number);
-
-
-
 int main(int argc, const char * argv[]) {
    
     string id_graph = "";
     
-    cout << "ENTER THE NAME OF YOUR GRAPH : " << endl;
+    cout << "ENTER THE NUMBER OF YOUR GRAPH :" << endl;
     cin >> id_graph;
     
     tt_contraintes* lesContraintes = new tt_contraintes;
@@ -37,9 +33,10 @@ int main(int argc, const char * argv[]) {
     id_graph = chooseGraph(id_graph);
     cout << id_graph << endl;
     
+    //if (loading_graph(id_graph)) {
     if (loading(id_graph, lesContraintes, leGraphe)) {
         
-        cout << "Loading successed\n" << endl;
+        cout << "\nLoading successed" << endl;
         
         print_graph_bool(lesContraintes, leGraphe);
         print_graph_adjacence(lesContraintes, leGraphe);
@@ -48,16 +45,13 @@ int main(int argc, const char * argv[]) {
         graph = fill_graph(lesContraintes, graph, leGraphe);
         
         graph = modify_element(graph, lesContraintes, leGraphe, current, next);
+        //display_graph_content(graph);
+        //reading_graph(graph);
         
         reading_graph(graph);
         
-        cout << "\n\n-----------------CALCUL DES RANGS-----------------" << endl;
         rank_computation(graph, graph_back_up);
         set_graph_cresc(graph_back_up, graph_cresc);
-        cout << "\n\n-----------------FIN DU CALCUL DES RANGS-----------------\n\n\n" << endl;
-        
-        
-        
         set_earliest_date(graph_cresc);
         display_graph_cresc(graph_cresc);
         display_earliest_dates(graph_cresc);
@@ -65,6 +59,7 @@ int main(int argc, const char * argv[]) {
         set_latest_date(graph_cresc);
         display_latest_dates(graph_cresc);
         
+        cout << "Test" << endl;
         
         free_memory(lesContraintes, leGraphe, graph, current, next);
         
@@ -76,6 +71,7 @@ int main(int argc, const char * argv[]) {
     
     return 0;
 }
+
 
 
 

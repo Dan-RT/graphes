@@ -14,10 +14,14 @@ void afficher_contrainte (tt_contraintes* lesContraintes, char name_contrainte) 
     
     for(vector<char>::iterator it= lesContraintes->contraintes[name_contrainte].begin(); it!=lesContraintes->contraintes[name_contrainte].end(); ++it) {
         
-        cout << name_contrainte << " ne peut commencer que lorsque la tache " << *it << " est terminee" << endl;
+        cout << "Test : " << name_contrainte << " ne peut commencer que lorsque la tache " << *it << " est terminee" << endl;
     }
     
 }
+
+
+
+
 
 
 int fill_graph (tt_contraintes* lesContraintes, int ligne, int colonne, bool choice) {
@@ -72,7 +76,7 @@ int loading(string id_graph, tt_contraintes* lesContraintes, tt_graphe* leGraphe
     
     if (myStream) {
         
-        cout << "\nLecture de tableau de contraintes" << endl;
+        cout << "\nLecture de tableau de contrainte" << endl;
         
         
         char tacheCourante, contrainteCourante;
@@ -157,6 +161,32 @@ int loading(string id_graph, tt_contraintes* lesContraintes, tt_graphe* leGraphe
 }
 
 
+
+
+
+
+
+
+void bellman (tt_graphe* leGraphe) {
+    
+    //initialisation
+    
+    
+    
+    //développement
+    for (int i = 0; i < leGraphe->nbSommets-1; i++) {
+        
+        
+        
+        
+        
+    }
+    
+    
+    //détection de boucles
+    
+
+}
 
 
 

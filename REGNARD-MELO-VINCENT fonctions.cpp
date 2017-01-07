@@ -47,6 +47,7 @@ vector<element> modify_element (vector<element> graph, tt_contraintes* lesContra
             }
         }
     }
+    cout << "test" << endl;
     display_graph_content(graph);
     //delete previous;
     //delete next;
@@ -91,13 +92,27 @@ void free_memory (tt_contraintes* lesContraintes, tt_graphe* leGraphe, vector<el
         leGraphe->adj[ligne] = NULL;
         delete leGraphe->val[ligne];
         leGraphe->val[ligne] = NULL;
+        //où sont les colonnes?
     };
     
     delete leGraphe;
     leGraphe = NULL;
     
     
-    cout << "\n\nMemory freed." <<endl;
+    /*
+    for(vector<element>::iterator it = graph.begin(); it != graph.end(); ++it) {
+        current = &*it;
+        for(vector<element*>::iterator it2 = current->next.begin(); it2 != current->next.end(); ++it2) {
+            //aucune idée, à reprendre
+        }
+    }
+     */
+    
+    //delete current;
+    //delete next;
+
+    
+    cout << "\n\nMemory partially freed." <<endl;
 }
 
 
@@ -125,56 +140,30 @@ int scan_graph (vector<element> graph, element* current) {
     return 0;
 }
 
-
-
-
-
-
-
-/*      DETECTION DE CIRCUIT        */
-
-
-
-
+void set_flag_false (vector<element> &graph, element* current) {
+    
+    for (int i = 0; i < current->next.size(); i++) {
+        current->flag = false;
+        set_flag_false(graph, current->next[i]);
+    }
+    
+}
 
 void delete_circuit (vector<element> &graph, char depart, char destination) {
-    
-    int flag = 0;
     
     for(vector<element>::iterator it = graph.begin(); it != graph.end(); ++it) {
         if (depart == it->name) {
             for(vector<element*>::iterator it_1 = it->next.begin(); it_1 != it->next.end(); ++it_1) {
                 
                 element* tmp = *it_1;
-                
+                cout << "Suppression de l'élément " << tmp->name << " de la liste des next de " << it->name << endl;
                 if (tmp->name == destination) {
-                    cout << "Suppression de l'élément " << tmp->name << " de la liste des next de " << it->name << endl;
                     it->next.erase(it_1);
-                    
-                    for(vector<element*>::iterator it_2 = tmp->previous.begin(); it_2 != tmp->previous.end(); ++it_2) {
-                        
-                        element* tmp_2 = *it_2;
-                        cout << "Test, depart : " << depart << " - Lu : " << tmp_2->name << endl;
-                        if (tmp_2->name == depart) {
-                            
-                            cout << "Suppression de l'élément " << tmp_2->name << " de la liste des previous de " << tmp->name << endl;
-                            tmp->previous.erase(it_2);
-                            flag = 1;
-                            break;
-                        }
-                        tmp_2 = nullptr;
-                    }
-                }
-                if (flag == 1) {
-                    break;
                 }
                 tmp = nullptr;
             }
-            if (flag == 1) {
-                break;
-            }
         }
-        /*
+        
         if (destination == it->name) {
             for(vector<element*>::iterator it_1 = it->previous.begin(); it_1 != it->previous.end(); ++it_1) {
                 
@@ -185,35 +174,18 @@ void delete_circuit (vector<element> &graph, char depart, char destination) {
                 }
                 tmp = nullptr;
             }
-        }*/
+        }
     }
     
 }
-
-
-
-
-
-
-void set_flag_false (vector<element> &graph, element* current) {
-    
-    for (int i = 0; i < current->next.size(); i++) {
-        current->flag = false;
-        set_flag_false(graph, current->next[i]);
-    }
-    
-}
-
 
 int circuit (vector<element> &graph, element* first, element* current, element* previous) {
     
     cout << current->name << endl;
-    
     for (int i = 0; i < current->next.size(); i++) {
-        
         if (i != 0) {
             if (current->next.size() > 0) {
-                set_flag_false(graph, current->next[i]);
+                //set_flag_false(graph, current->next[i], i);
             }
         }
         
@@ -221,12 +193,11 @@ int circuit (vector<element> &graph, element* first, element* current, element* 
             cout << current->name << endl;
         
             cout << "Circuit détecté. " << endl;
+            exit(0);
             delete_circuit(graph, previous->name, current->name);
             
         } else {
             current->flag = true;
-            //On met un flag pour signaler qu'on est passé ici sur cet élément déjà
-            
             circuit(graph, first, current->next[i], current);
             cout << "." << endl;
         }
@@ -239,26 +210,27 @@ int circuit (vector<element> &graph, element* first, element* current, element* 
 void reading_graph (vector<element> graph) {
     
     //determiner qui est le premier, le premier element est un élément sans previous
-
+    element* test;
     element* first;
+    int flag = 0;
     
     for(vector<element>::iterator it = graph.begin(); it != graph.end(); ++it) {
-        first = &*it;
-        circuit(graph, first, first, first);
-        /*
-        if (first->previous.size() == 0) {
-            cout << "\n\nFirst element : " << first->name << endl;
-            cout << "\nPath : " << endl;
+        test = &*it;
+        if (test->previous.size() == 0) {
+            first = &*it;
+            flag = 1;
+            
+            cout << "First element : " << first->name << endl;
             circuit(graph, first, first, first);
         }
-        if (it == graph.begin()) {
-            circuit(graph, first, first, first);
-        }*/
+    }
+    if (flag == 0) {
+        cout << "No starting element." << endl;
+        exit(0);
     }
     
     
     
-    first = NULL;
     
     
     
@@ -270,9 +242,6 @@ void reading_graph (vector<element> graph) {
 
 
 
-
-
-/*      FIN DETECTION DE CIRCUIT        */
 
 
 
@@ -306,6 +275,8 @@ void rank_computation (vector<element> graph, map<char, element> &graph_back_up)
     vector<char> element_to_erase;  //certains éléments sont à effacer en même temps
     multimap<char, char> previous_to_erase;
     
+    int test = 0;
+   
     //les rangs sont déjà initialisés
     
     while (graph.size() > 0) {
@@ -332,7 +303,9 @@ void rank_computation (vector<element> graph, map<char, element> &graph_back_up)
                         cout << it_1->name << endl;
                         tmp = *it_2;
                         if (tmp->name == it->name) {
-                            
+                            if (it->name == '7') {
+                                test = 1;
+                            }
                             previous_to_erase.insert(pair<char, char>(it_1->name,it->name));
                             //previous_to_erase[it_1->name] = it->name;
                             //it_1->previous.erase(it_2);
@@ -349,7 +322,9 @@ void rank_computation (vector<element> graph, map<char, element> &graph_back_up)
             }
         }
         cout << "Fin des lettres à tester." << endl;
-       
+        if (test) {
+            cout << "test" << endl;
+        }
         
         if (element_to_erase.size() > 0) {
             for(vector<char>::iterator it = element_to_erase.begin(); it != element_to_erase.end(); ++it) {
@@ -460,7 +435,7 @@ void modify_element_graph_resc (multimap<int, element> &graph_cresc, int early_d
         for(vector<element*>::iterator it_1 = it->second.next.begin(); it_1 != it->second.next.end(); ++it_1) {
             
             if (it->second.name=='7') {
-                //cout << "test" << endl;
+                cout << "test" << endl;
             }
                 
             //puis chaque next
@@ -518,13 +493,11 @@ void set_latest_date (multimap<int, element> &graph_cresc) {
     for(multimap<int,element>::iterator it = graph_cresc.end(); it != graph_cresc.begin(); --it) {
         //on parcourt tout les éléments de la fin vers le début
         
-        
-        
         if (it != graph_cresc.end()) {
             //pour éviter un bad access, faut pas aller trop loin
             
-            if (it->second.name == '1') {
-                //cout << "test" << endl;
+            if (it->second.name == '9') {
+                cout << "test" << endl;
             }
             
             for(vector<element*>::iterator it_1 = it->second.next.begin(); it_1 != it->second.next.end(); ++it_1) {
@@ -543,7 +516,6 @@ void set_latest_date (multimap<int, element> &graph_cresc) {
             }
             
             it->second.sum_l_date_duration = it->second.latest_date + it->second.duration;
-            
             modify_element_graph_resc(graph_cresc, it->second.earliest_date, it->second.name, it->second.latest_date, it->second.sum_l_date_duration);
         }
     }
