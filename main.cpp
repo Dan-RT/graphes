@@ -58,9 +58,9 @@ int main(int argc, const char * argv[]) {
         modify_element_dynamic(graph_dynamic, lesContraintes, leGraphe);
         
         
-        display_graph_dynamic_content(graph_dynamic);
+        //display_graph_dynamic_content(graph_dynamic);
         //reading_graph_dynamic(graph_dynamic);
-        display_graph_dynamic_content(graph_dynamic);
+        //display_graph_dynamic_content(graph_dynamic);
         copy_dynamic_to_static(graph_dynamic, graph);
         display_graph_content(graph);
         //free_dynamic_memory(graph_dynamic);

@@ -48,24 +48,24 @@ void modify_element_dynamic (vector<element*> &graph_dynamic, tt_contraintes* le
     element* current = new element;
     element* previous = new element;
 
-    for (int ligne = 1; ligne <= leGraphe->nbSommets - 2; ligne++) {
+    //for (int ligne = 1; ligne <= leGraphe->nbSommets - 2; ligne++) {
         //cout << "\nLETTRE DE BASE : " << lesContraintes->nomTaches[ligne] << endl;
-    //for (int colonne = 1; colonne <= leGraphe->nbSommets - 2; colonne++) {
+    for (int colonne = 1; colonne <= leGraphe->nbSommets - 2; colonne++) {
         for(vector<element*>::iterator it = graph_dynamic.begin(); it != graph_dynamic.end(); ++it) {
             
             current = *it;
             //cout << "Lettre testée : " << current->name << endl;
             
-            if (lesContraintes->nomTaches[ligne] == current->name) {
+            if (lesContraintes->nomTaches[colonne] == current->name) {
                 
-                for (int colonne = 1; colonne <= leGraphe->nbSommets - 2; colonne++) {
-                //for (int ligne = 1; ligne <= leGraphe->nbSommets - 2; ligne++) {
+                //for (int colonne = 1; colonne <= leGraphe->nbSommets - 2; colonne++) {
+                for (int ligne = 1; ligne <= leGraphe->nbSommets - 2; ligne++) {
                     if (leGraphe->adj[colonne][ligne] == 1) {
                         
                         for(vector<element*>::iterator it_2 = graph_dynamic.begin(); it_2 != graph_dynamic.end(); ++it_2) {
                             previous = *it_2;
                             
-                            if (lesContraintes->nomTaches[colonne] == previous->name) {
+                            if (lesContraintes->nomTaches[ligne] == previous->name) {
                                 
                                 if (current->name == 'C') {
                                     cout << "test" << endl;
@@ -78,12 +78,15 @@ void modify_element_dynamic (vector<element*> &graph_dynamic, tt_contraintes* le
                                 //current->next.push_back(current);
                                 //next->previous.push_back(next);
                                 
-                                display_graph_dynamic_content(graph_dynamic);
+                                //display_graph_dynamic_content(graph_dynamic);
                                 if (reading_graph_dynamic(graph_dynamic) == 1) {
+                                    //display_graph_dynamic_content(graph_dynamic);
                                     delete_circuit_dynamic(graph_dynamic, previous->name, current->name);
+                                    set_flag_false_dynamic(graph_dynamic);
+                                    //display_graph_dynamic_content(graph_dynamic);
                                 }
                                 
-                                display_graph_dynamic_content(graph_dynamic);
+                                //display_graph_dynamic_content(graph_dynamic);
                             }
                         }
                     }
@@ -156,9 +159,58 @@ void delete_circuit_dynamic (vector<element*> &graph_dynamic, char depart, char 
     
     int flag = 0;
     
-    for(vector<element*>::iterator it = graph_dynamic.begin(); it != graph_dynamic.end(); ++it) {
+    //for(vector<element*>::iterator it = graph_dynamic.begin(); it != graph_dynamic.end(); ++it) {
+    for (int i = 0; i < graph_dynamic.size() ; i++) {
+        if (depart == graph_dynamic[i]->name) {
+            
+            for(vector<element*>::iterator it_1 = graph_dynamic[i]->next.begin(); it_1 != graph_dynamic[i]->next.end(); ++it_1) {
+                
+                element* temp = *it_1;
+                if (temp != nullptr) {
+                    if (temp->name == destination) {
+                        //cout << "\n" << endl;
+                        cout << "Circuit détecté, suppression de l'élément " << temp->name << " de la liste des next de " << graph_dynamic[i]->name << endl;
+                        graph_dynamic[i]->next.erase(it_1);
+                        flag++;
+                    }
+                    
+                } else {
+                    break;
+                }
+                temp = nullptr;
+                delete temp;
+            }
+        }
         
-        element* it_element = *it;
+        if (destination == graph_dynamic[i]->name) {
+            for(vector<element*>::iterator it_1 = graph_dynamic[i]->previous.begin(); it_1 != graph_dynamic[i]->previous.end(); ++it_1) {
+                
+                element* temp = *it_1;
+                if (temp != nullptr) {
+                    if (temp->name == depart) {
+                        cout << "Circuit détecté, suppression de l'élément " << temp->name << " de la liste des previous de " << graph_dynamic[i]->name << endl;
+                        graph_dynamic[i]->previous.erase(it_1);
+                        flag++;
+                    }
+                } else {
+                    break;
+                }
+                
+                temp = nullptr;
+                delete temp;
+            }
+        }
+        if (flag > 1) {
+            break;
+        }
+        
+        
+    }
+}
+    
+        
+   /*
+    element* it_element = *it;
         
         if (depart == it_element->name) {
             for(vector<element*>::iterator it_1 = it_element->next.begin(); it_1 != it_element->next.end(); ++it_1) {
@@ -179,6 +231,8 @@ void delete_circuit_dynamic (vector<element*> &graph_dynamic, char depart, char 
                 delete tmp;
             }
         }
+    
+    
         if (destination == it_element->name) {
             for(vector<element*>::iterator it_1 = it_element->previous.begin(); it_1 != it_element->previous.end(); ++it_1) {
                 
@@ -205,7 +259,7 @@ void delete_circuit_dynamic (vector<element*> &graph_dynamic, char depart, char 
         delete it_element;
         
     }
-}
+}*/
 
 
 
@@ -215,7 +269,7 @@ void delete_circuit_dynamic (vector<element*> &graph_dynamic, char depart, char 
 
 int circuit (vector<element*> &graph_dynamic, element* first, element* current, element* previous, bool surface) {
     
-    cout << current->name << endl;
+    //cout << current->name << endl;
     
     for (int i = 0; i < current->next.size(); i++) {
         
@@ -229,7 +283,7 @@ int circuit (vector<element*> &graph_dynamic, element* first, element* current, 
         if (current->flag == true) {
             
             //si on est déjà passé par cette lettre il y a un circuit
-            cout << current->name << endl;
+            //cout << current->name << endl;
             cout << "Circuit détecté. " << endl;
             
             return 1;
@@ -244,7 +298,7 @@ int circuit (vector<element*> &graph_dynamic, element* first, element* current, 
             if (circuit(graph_dynamic, first, current->next[i], current, false) == 1) {
                 return 1;
             }
-            cout << "." << endl;
+            //cout << "." << endl;
         }
     }
     
@@ -263,7 +317,7 @@ int reading_graph_dynamic (vector<element*> &graph_dynamic) {
     for(vector<element*>::iterator it = graph_dynamic.begin(); it != graph_dynamic.end(); ++it) {
         first = *it;
         
-        cout << "Element de départ testés : " << first->name << endl;
+        //cout << "Element de départ testés : " << first->name << endl;
         
         if (circuit(graph_dynamic, first, first, first, true) == 1) {
             first = nullptr;
@@ -289,7 +343,7 @@ void copy_dynamic_to_static (vector<element*> &graph_dynamic, vector<element> &g
     
     for (int i = 0; i < graph_dynamic.size() && i < graph.size(); i++) {
         
-        cout << graph_dynamic[i]->name << " " << graph[i].name << endl;
+        //cout << graph_dynamic[i]->name << " " << graph[i].name << endl;
         
         if (graph_dynamic[i]->name == graph[i].name) {
             graph[i].duration = graph_dynamic[i]->duration;
@@ -497,6 +551,115 @@ void display_graph_dynamic_map (map<char, element*> graph_dynamic_back_up) {
 
 
 
+/*
+
+
+
+
+void modify_element_dynamic (vector<element*> &graph_dynamic, tt_contraintes* lesContraintes, tt_graphe* leGraphe) {
+    
+    element* current = new element;
+    element* next = new element;
+    
+    element* it_element2 = nullptr;
+    element* it_element = nullptr;
+    
+    for (int ligne = 0; ligne <= leGraphe->nbSommets - 2; ligne++) {
+        cout << "\nLETTRE DE BASE : " << lesContraintes->nomTaches[ligne] << endl;
+        for (int colonne = 1; colonne <= leGraphe->nbSommets - 2; colonne++) {
+            
+            if (leGraphe->adj[colonne][ligne] == 1) {
+                
+                for(vector<element*>::iterator it = graph_dynamic.begin(); it != graph_dynamic.end(); ++it) {
+                    
+                    it_element = nullptr;
+                    it_element = *it;
+                    //le supprimer attention
+                    
+                    if (lesContraintes->nomTaches[ligne] == it_element->name) {
+                        cout << "Lettre lue dans le graphe initial : " << lesContraintes->nomTaches[ligne] << endl;
+                        cout << "Lettre lue par le it : " << it_element->name << endl;
+                        current = it_element;
+                        
+                        for(vector<element*>::iterator it_2 = graph_dynamic.begin(); it_2 != graph_dynamic.end(); ++it_2) {
+                            
+                            it_element2 = *it_2;
+                            //le supprimer attention
+                            
+                            if (lesContraintes->nomTaches[colonne] == it_element2->name) {
+                                
+                                cout << "Lettre lue dans le graphe initial : " << lesContraintes->nomTaches[colonne] << endl;
+                                cout << "Lettre lue par le it_2 : " << it_element2->name << endl;
+                                
+                                next = it_element2;
+                                current->next.push_back(next);
+                                next->previous.push_back(current);
+                                
+                            }
+                            it_element2 = nullptr;
+                        }
+                    }
+                    it_element = nullptr;
+                }
+            }
+        }
+    }
+    
+    next = nullptr;
+    current = nullptr;
+    
+    delete next;
+    delete current;
+    delete it_element;
+    delete it_element2;
+}
+
+
+            if (lesContraintes->nomTaches[ligne] == current->name) {
+                
+                for (int colonne = 1; colonne <= leGraphe->nbSommets - 2; colonne++) {
+                    //for (int ligne = 1; ligne <= leGraphe->nbSommets - 2; ligne++) {
+                    if (leGraphe->adj[colonne][ligne] == 1) {
+                        
+                        for(vector<element*>::iterator it_2 = graph_dynamic.begin(); it_2 != graph_dynamic.end(); ++it_2) {
+                            previous = *it_2;
+                            
+                            if (lesContraintes->nomTaches[colonne] == previous->name) {
+                                
+                                if (current->name == 'C') {
+                                    cout << "test" << endl;
+                                }
+                                
+                                cout << "\n" << current->name <<  " ne peut commencer que lorsque la tache " << previous->name << " est terminee. " << endl;
+                                
+                                previous->next.push_back(current);
+                                current->previous.push_back(previous);
+                                //current->next.push_back(current);
+                                //next->previous.push_back(next);
+                                
+                                display_graph_dynamic_content(graph_dynamic);
+                                if (reading_graph_dynamic(graph_dynamic) == 1) {
+                                    display_graph_dynamic_content(graph_dynamic);
+                                    delete_circuit_dynamic(graph_dynamic, previous->name, current->name);
+                                }
+                                
+                                //display_graph_dynamic_content(graph_dynamic);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    previous = nullptr;
+    current = nullptr;
+    
+    delete previous;
+    delete current;
+    
+    
+}
 
 
 
@@ -522,15 +685,34 @@ void display_graph_dynamic_map (map<char, element*> graph_dynamic_back_up) {
 
 
 
+for (int ligne = 0; ligne <= leGraphe->nbSommets - 2; ligne++) {
+    for (int colonne = 1; colonne <= leGraphe->nbSommets - 2; colonne++) {
+        
+        if (leGraphe->adj[colonne][ligne] == 1) {
+            
+            for(vector<element>::iterator it = graph.begin(); it != graph.end(); ++it) {
+                
+                if (lesContraintes->nomTaches[ligne] == it->name) {
+                    //cout << "Lettre lue dans le graphe initial : " << lesContraintes->nomTaches[ligne] << endl;
+                    //cout << "Lettre lue par le it : " << it->name << endl;
+                    current = &*it;
+                    
+                    for(vector<element>::iterator it_2 = graph.begin(); it_2 != graph.end(); ++it_2) {
+                        
+                        if (lesContraintes->nomTaches[colonne] == it_2->name) {
+                            
+                            //cout << "Lettre lue dans le graphe initial : " << lesContraintes->nomTaches[colonne] << endl;
+                            //cout << "Lettre lue par le it_2 : " << it_2->name << endl;
+                            
+                            next = &*it_2;
+                            current->next.push_back(next);
+                            next->previous.push_back(current);
+                            
+                        }
 
 
 
-
-
-
-
-
-
+*/
 
 
 
