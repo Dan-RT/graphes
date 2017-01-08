@@ -146,48 +146,64 @@ void delete_circuit (vector<element> &graph, char depart, char destination) {
             for(vector<element*>::iterator it_1 = it->next.begin(); it_1 != it->next.end(); ++it_1) {
                 
                 element* tmp = *it_1;
-                
-                if (tmp->name == destination) {
-                    cout << "Suppression de l'élément " << tmp->name << " de la liste des next de " << it->name << endl;
-                    it->next.erase(it_1);
-                    
-                    for(vector<element*>::iterator it_2 = tmp->previous.begin(); it_2 != tmp->previous.end(); ++it_2) {
+                if (tmp != nullptr) {
+                    if (tmp->name == destination) {
+                        //cout << "\n" << endl;
+                        cout << "Circuit détecté, suppression de l'élément " << tmp->name << " de la liste des next de " << it->name << endl;
+                        it->next.erase(it_1);
+                        flag++;
+                        //display_graph_content(graph);
                         
-                        element* tmp_2 = *it_2;
-                        cout << "Test, depart : " << depart << " - Lu : " << tmp_2->name << endl;
-                        if (tmp_2->name == depart) {
-                            
-                            cout << "Suppression de l'élément " << tmp_2->name << " de la liste des previous de " << tmp->name << endl;
-                            tmp->previous.erase(it_2);
-                            flag = 1;
-                            break;
-                        }
-                        tmp_2 = nullptr;
+                        /*
+                         for(vector<element*>::iterator it_2 = tmp->previous.begin(); it_2 != tmp->previous.end(); ++it_2) {
+                         
+                         element* tmp_2 = *it_2;
+                         
+                         if (tmp_2->name == depart) {
+                         cout << "\n" << endl;
+                         cout << "Suppression de l'élément " << tmp_2->name << " de la liste des previous de " << tmp->name << endl;
+                         tmp->previous.erase(it_2);
+                         
+                         
+                         display_graph_content(graph);
+                         flag = 1;
+                         break;
+                         }
+                         tmp_2 = nullptr;
+                         }*/
                     }
-                }
-                if (flag == 1) {
+
+                } else {
                     break;
                 }
                 tmp = nullptr;
             }
+            /*
             if (flag == 1) {
                 break;
-            }
+            }*/
         }
-        /*
         if (destination == it->name) {
             for(vector<element*>::iterator it_1 = it->previous.begin(); it_1 != it->previous.end(); ++it_1) {
                 
                 element* tmp = *it_1;
-                cout << "Suppression de l'élément " << tmp->name << " de la liste des previous de " << it->name << endl;
-                if (tmp->name == destination) {
-                    it->previous.erase(it_1);
+                if (tmp != nullptr) {
+                    if (tmp->name == depart) {
+                        cout << "Circuit détecté, suppression de l'élément " << tmp->name << " de la liste des previous de " << it->name << endl;
+                        it->previous.erase(it_1);
+                        flag++;
+                    }
+                } else {
+                    break;
                 }
+                
                 tmp = nullptr;
             }
-        }*/
+        }
+        if (flag > 1) {
+            break;
+        }
     }
-    
 }
 
 
@@ -195,31 +211,66 @@ void delete_circuit (vector<element> &graph, char depart, char destination) {
 
 
 
-void set_flag_false (vector<element> &graph, element* current) {
+int set_flag_false (vector<element> &graph, element* current, int indice, bool from_circuit, int profondeur_max, int profondeur) {
     
-    for (int i = 0; i < current->next.size(); i++) {
+    //le pramètre indice permet de savoir quel voisin checker, car on ne va pas risque de lire les next+1 si on ne sait pas s'il y a un circuit derrière le next+0
+    
+    //le paramètre from_circuit sert à savoir d'où on appelle la fonction set_flag_false, si c'est de la fonction de circuit ou par récurrence. Si c'est par récurrence on va alors vouloir parcourir pour le coup tous les next+1
+    if (profondeur > profondeur_max) {
+        return 0;
+    }
+    
+    if (from_circuit) {
+        //cout << current->name << endl;
+        //cout << "\n" << endl;
         current->flag = false;
-        set_flag_false(graph, current->next[i]);
+        //display_graph_content(graph);
+        if (current->next.size() > 0) {
+            if (!set_flag_false(graph, current->next[indice], 0, false, profondeur_max, profondeur)) {
+                return 0;
+            }
+        } else {
+            return 0;
+        }
+        
+        
+    } else {
+        for (int i = 0; i < current->next.size(); i++) {
+            //cout << current->name << endl;
+            //cout << "\n" << endl;
+            //display_graph_content(graph);
+            
+            current->flag = false;
+            profondeur++;
+            if (!set_flag_false(graph, current->next[i], 0, false, profondeur_max, profondeur)) {
+                return 0;
+            }
+            
+            
+        }
     }
-    
+    return 0;
 }
 
-
+/*
 int circuit (vector<element> &graph, element* first, element* current, element* previous) {
     
     cout << current->name << endl;
+    int flag = 0;
     
     for (int i = 0; i < current->next.size(); i++) {
         
         if (i != 0) {
             if (current->next.size() > 0) {
-                set_flag_false(graph, current->next[i]);
+                set_flag_false(graph, current->next[i], i-1, true, flag, 0);
             }
+            current->flag = false;
+            cout << current->name << endl;
         }
         
         if (current->flag == true && i == 0) {
             cout << current->name << endl;
-        
+            
             cout << "Circuit détecté. " << endl;
             delete_circuit(graph, previous->name, current->name);
             
@@ -235,8 +286,84 @@ int circuit (vector<element> &graph, element* first, element* current, element* 
     
     return 0;
 }
+*/
 
-void reading_graph (vector<element> graph) {
+
+int circuit (vector<element> &graph, element* first, element* current, element* previous, bool surface) {
+    
+    cout << current->name << endl;
+    int flag = 0;
+    
+    for (int i = 0; i < current->next.size(); i++) {
+        
+        if (i != 0) {
+            if (current->next.size() > 0) {
+                set_flag_false(graph, current->next[i], i-1, true, flag, 0);
+            }
+            current->flag = false;
+            cout << current->name << endl;
+        }
+        
+        if (current->flag == true) {
+            cout << current->name << endl;
+        
+            cout << "Circuit détecté. " << endl;
+            /*
+            if (surface) {
+                delete_circuit(graph, previous->name, current->name);
+                //set_flag_false(graph, current->next[i], i-1, true, flag, 0);
+            }*/
+            flag = 2;
+            break;
+            
+            
+            
+        } else {
+            current->flag = true;
+            //On met un flag pour signaler qu'on est déjà passé sur cet élément
+            
+            int check = circuit(graph, first, current->next[i], current, false);
+            
+            //dès qu'on trouve un circuit on sort de la recherche
+            //vérifier ce que renvoie la fonction circuit permet de savoir si on doit supprimer l'arc ou non, si on fait pas gaffe et supprime tous les axes testés par réccurence
+            if (check > 1) {
+                
+                flag = 1;
+                delete_circuit(graph, previous->name, current->name);
+                //delete_circuit(graph, current->name, current->previous[i]->name);
+                cout << "\n" << endl;
+                //display_graph_content(graph);
+                set_flag_false(graph, current, i, true, flag, 0);
+                
+                /*
+                 if (surface == true && i == 0) {
+                 check = 0;
+                 flag = 0;
+                 break;
+                 }*/
+                
+            } else if (check == 1)  {
+                flag = 1;
+                
+                break;
+            }
+            
+            cout << "." << endl;
+          
+        }
+    }
+    
+    if (flag > 1) {
+        return flag;
+    } else if (flag == 1) {
+        return 1;
+    } else {
+        return 0;
+    }
+    
+}
+
+void reading_graph (vector<element> &graph) {
     
     //determiner qui est le premier, le premier element est un élément sans previous
 
@@ -244,7 +371,12 @@ void reading_graph (vector<element> graph) {
     
     for(vector<element>::iterator it = graph.begin(); it != graph.end(); ++it) {
         first = &*it;
-        circuit(graph, first, first, first);
+        if (first->name == 'J') {
+            cout << "debug" << endl;
+        }
+        cout << "Element de départ testés : " << first->name << endl;
+        
+        circuit(graph, first, first, first, true);
         /*
         if (first->previous.size() == 0) {
             cout << "\n\nFirst element : " << first->name << endl;
