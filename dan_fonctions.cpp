@@ -69,7 +69,6 @@ vector<element> fill_graph (tt_contraintes* lesContraintes, vector<element> grap
         new_element.sum_e_date_duration = 0;
         new_element.diff_l_date_duration = 0;
         new_element.sum_l_date_duration = 0;
-        new_element.safe = false;
         graph.push_back(new_element);
     }
     

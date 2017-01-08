@@ -17,7 +17,6 @@ struct element {
     char name;
     int duration;
     bool flag;
-    bool safe;
     int rank;
     vector<element*> previous;
     vector<element*> next;

@@ -21,7 +21,6 @@ void fill_graph_dynamic (tt_contraintes* lesContraintes, vector<element*> &graph
         new_element->sum_e_date_duration = 0;
         new_element->diff_l_date_duration = 0;
         new_element->sum_l_date_duration = 0;
-        new_element->safe = false;
         graph_dynamic.push_back(new_element);
     }
     
@@ -84,13 +83,6 @@ void modify_element_dynamic (vector<element*> &graph_dynamic, tt_contraintes* le
     
 }
 
-
-
-
-
-
-
-
 void display_graph_dynamic_content (vector<element*> graph_dynamic) {
     
     element* current = new element;
@@ -124,29 +116,6 @@ void display_graph_dynamic_content (vector<element*> graph_dynamic) {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 void free_dynamic_memory (vector<element*> &graph_dynamic) {
     
     /*for (int i = 0; i < graph_dynamic.size(); i++) {
@@ -159,6 +128,255 @@ void free_dynamic_memory (vector<element*> &graph_dynamic) {
     }
     graph_dynamic.clear();
 }
+
+
+
+
+
+
+
+
+void delete_circuit (vector<element*> &graph_dynamic, char depart, char destination) {
+    
+    int flag = 0;
+    
+    for(vector<element*>::iterator it = graph_dynamic.begin(); it != graph_dynamic.end(); ++it) {
+        
+        element* it_element = *it;
+        
+        if (depart == it_element->name) {
+            for(vector<element*>::iterator it_1 = it_element->next.begin(); it_1 != it_element->next.end(); ++it_1) {
+                
+                element* tmp = *it_1;
+                if (tmp != nullptr) {
+                    if (tmp->name == destination) {
+                        //cout << "\n" << endl;
+                        cout << "Circuit détecté, suppression de l'élément " << tmp->name << " de la liste des next de " << it_element->name << endl;
+                        it_element->next.erase(it_1);
+                        flag++;
+                    }
+                    
+                } else {
+                    break;
+                }
+                tmp = nullptr;
+                delete tmp;
+            }
+        }
+        if (destination == it_element->name) {
+            for(vector<element*>::iterator it_1 = it_element->previous.begin(); it_1 != it_element->previous.end(); ++it_1) {
+                
+                element* tmp = *it_1;
+                if (tmp != nullptr) {
+                    if (tmp->name == depart) {
+                        cout << "Circuit détecté, suppression de l'élément " << tmp->name << " de la liste des previous de " << it_element->name << endl;
+                        it_element->previous.erase(it_1);
+                        flag++;
+                    }
+                } else {
+                    break;
+                }
+                
+                tmp = nullptr;
+                delete tmp;
+            }
+        }
+        if (flag > 1) {
+            break;
+        }
+        
+        it_element = nullptr;
+        delete it_element;
+        
+    }
+}
+
+
+
+
+
+
+
+int circuit (vector<element*> &graph_dynamic, element* first, element* current, element* previous, bool surface) {
+    
+    cout << current->name << endl;
+    int flag = 0;
+    
+    for (int i = 0; i < current->next.size(); i++) {
+        
+        
+        if (current->flag == true) {
+            
+            //si on est déjà passé par cette lettre il y a un circuit
+            
+            cout << current->name << endl;
+            
+            cout << "Circuit détecté. " << endl;
+            /*
+             if (surface) {
+             delete_circuit(graph, previous->name, current->name);
+             //set_flag_false(graph, current->next[i], i-1, true, flag, 0);
+             }*/
+            flag = 2;
+            break;
+            
+            
+            
+        } else {
+            
+            //Si y'a pas de circuit
+            
+            current->flag = true;
+            //On met un flag pour signaler qu'on est déjà passé sur cet élément
+            
+            int check = circuit(graph_dynamic, first, current->next[i], current, false);
+            
+            //dès qu'on trouve un circuit on sort de la recherche
+            //vérifier ce que renvoie la fonction circuit permet de savoir si on doit supprimer l'arc ou non, si on fait pas gaffe et supprime tous les axes testés par réccurence
+            
+            if (check > 1) {
+                
+                flag = 1;
+                delete_circuit(graph_dynamic, previous->name, current->name);
+                //delete_circuit(graph, current->name, current->previous[i]->name);
+                cout << "\n" << endl;
+                //display_graph_content(graph);
+                //set_flag_false(graph, current, i, true, flag, 0);
+                
+                /*
+                 if (surface == true && i == 0) {
+                 check = 0;
+                 flag = 0;
+                 break;
+                 }*/
+                
+            } else if (check == 1)  {
+                flag = 1;
+                
+                break;
+            } else if (check == 0) {
+                
+                current->flag = 0;
+            }
+            
+            cout << "." << endl;
+            
+            
+        }
+    }
+    
+    if (flag > 1) {
+        return flag;
+    } else if (flag == 1) {
+        return 1;
+    } else {
+        return 0;
+    }
+    
+}
+
+
+
+
+void reading_graph_dynamic (vector<element*> &graph_dynamic) {
+    
+    //determiner qui est le premier, le premier element est un élément sans previous
+    
+    element* first;
+    
+    for(vector<element*>::iterator it = graph_dynamic.begin(); it != graph_dynamic.end(); ++it) {
+        first = *it;
+        
+        cout << "Element de départ testés : " << first->name << endl;
+        
+        circuit(graph_dynamic, first, first, first, true);
+        
+    }
+    
+    
+    
+    first = nullptr;
+    delete first;
+}
+
+
+
+void copy_dynamic_to_static (vector<element*> &graph_dynamic, vector<element> &graph) {
+    
+    
+    for (int i = 0; i < graph_dynamic.size() && i < graph.size(); i++) {
+        
+        cout << graph_dynamic[i]->name << " " << graph[i].name << endl;
+        
+        if (graph_dynamic[i]->name == graph[i].name) {
+            graph[i].duration = graph_dynamic[i]->duration;
+            graph[i].rank = graph_dynamic[i]->rank;
+            graph[i].earliest_date = graph_dynamic[i]->earliest_date;
+            graph[i].sum_e_date_duration = graph_dynamic[i]->sum_e_date_duration;
+            graph[i].latest_date = graph_dynamic[i]->latest_date;
+            graph[i].diff_l_date_duration = graph_dynamic[i]->diff_l_date_duration;
+            graph[i].sum_l_date_duration = graph_dynamic[i]->sum_l_date_duration;
+            
+            if (graph_dynamic[i]->next.size() > 0) {
+                for (int j = 0; j < graph_dynamic[i]->next.size(); j++) {
+                    element* new_element = new element;
+                    new_element->name = graph_dynamic[i]->next[j]->name;
+                    new_element->duration = graph_dynamic[i]->next[j]->duration;
+                    new_element->rank = graph_dynamic[i]->next[j]->rank;
+                    new_element->earliest_date = graph_dynamic[i]->next[j]->earliest_date;
+                    new_element->latest_date = graph_dynamic[i]->next[j]->latest_date;
+                    new_element->sum_e_date_duration = graph_dynamic[i]->next[j]->sum_e_date_duration;
+                    new_element->diff_l_date_duration = graph_dynamic[i]->next[j]->diff_l_date_duration;
+                    new_element->sum_l_date_duration = graph_dynamic[i]->next[j]->sum_l_date_duration;
+                    graph[i].next.push_back(new_element);
+                }
+            }
+            
+            if (graph_dynamic[i]->previous.size() > 0) {
+                for (int j = 0; j < graph_dynamic[i]->previous.size(); j++) {
+                    element* new_element = new element;
+                    new_element->name = graph_dynamic[i]->previous[j]->name;
+                    new_element->duration = graph_dynamic[i]->previous[j]->duration;
+                    new_element->rank = graph_dynamic[i]->previous[j]->rank;
+                    new_element->earliest_date = graph_dynamic[i]->previous[j]->earliest_date;
+                    new_element->latest_date = graph_dynamic[i]->previous[j]->latest_date;
+                    new_element->sum_e_date_duration = graph_dynamic[i]->previous[j]->sum_e_date_duration;
+                    new_element->diff_l_date_duration = graph_dynamic[i]->previous[j]->diff_l_date_duration;
+                    new_element->sum_l_date_duration = graph_dynamic[i]->previous[j]->sum_l_date_duration;
+                    graph[i].previous.push_back(new_element);
+                }
+            }
+            
+        }
+        
+    }
+    
+    
+    
+    
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

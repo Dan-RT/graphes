@@ -52,12 +52,16 @@ int main(int argc, const char * argv[]) {
         
         graph = fill_graph(lesContraintes, graph, leGraphe);
         
-        graph = modify_element(graph, lesContraintes, leGraphe, current, next);
+        //graph = modify_element(graph, lesContraintes, leGraphe, current, next);
         
         fill_graph_dynamic(lesContraintes, graph_dynamic);
         modify_element_dynamic(graph_dynamic, lesContraintes, leGraphe);
         display_graph_dynamic_content(graph_dynamic);
-        free_dynamic_memory(graph_dynamic);
+        reading_graph_dynamic(graph_dynamic);
+        display_graph_dynamic_content(graph_dynamic);
+        copy_dynamic_to_static(graph_dynamic, graph);
+        display_graph_content(graph);
+        //free_dynamic_memory(graph_dynamic);
         
         //reading_graph(graph);
         
