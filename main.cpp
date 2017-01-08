@@ -37,6 +37,8 @@ int main(int argc, const char * argv[]) {
     vector<element> graph;
     map<char, element> graph_back_up;
     multimap<int, element> graph_cresc;
+    
+    map<char, element*> graph_dynamic_back_up;
     vector<element*> graph_dynamic;
     
     id_graph = chooseGraph(id_graph);
@@ -67,6 +69,11 @@ int main(int argc, const char * argv[]) {
         
         cout << "\n\n-----------------CALCUL DES RANGS-----------------" << endl;
         rank_computation(graph, graph_back_up);
+        
+        rank_computation_dynamic(graph_dynamic, graph_dynamic_back_up);
+       
+        
+        
         set_graph_cresc(graph_back_up, graph_cresc);
         cout << "\n\n-----------------FIN DU CALCUL DES RANGS-----------------\n\n\n" << endl;
         

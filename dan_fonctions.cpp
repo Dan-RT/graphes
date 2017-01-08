@@ -444,7 +444,6 @@ void set_rank (map<char, element> &graph_back_up, vector<element> graph, int ran
 
 void rank_computation (vector<element> graph, map<char, element> &graph_back_up) {
     
-    //vector<element> graph_back_up = graph;
     
     create_graph_map(graph, graph_back_up);
     element* tmp = nullptr;
