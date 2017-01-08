@@ -69,6 +69,7 @@ vector<element> fill_graph (tt_contraintes* lesContraintes, vector<element> grap
         new_element.sum_e_date_duration = 0;
         new_element.diff_l_date_duration = 0;
         new_element.sum_l_date_duration = 0;
+        new_element.safe = false;
         graph.push_back(new_element);
     }
     
@@ -221,11 +222,12 @@ int set_flag_false (vector<element> &graph, element* current, int indice, bool f
     }
     
     if (from_circuit) {
-        //cout << current->name << endl;
+        cout << "Set flag false function :\n" << current->name << endl;
         //cout << "\n" << endl;
         current->flag = false;
         //display_graph_content(graph);
         if (current->next.size() > 0) {
+            
             if (!set_flag_false(graph, current->next[indice], 0, false, profondeur_max, profondeur)) {
                 return 0;
             }
@@ -235,8 +237,9 @@ int set_flag_false (vector<element> &graph, element* current, int indice, bool f
         
         
     } else {
+        cout << current->name << endl;
         for (int i = 0; i < current->next.size(); i++) {
-            //cout << current->name << endl;
+            
             //cout << "\n" << endl;
             //display_graph_content(graph);
             
@@ -297,14 +300,21 @@ int circuit (vector<element> &graph, element* first, element* current, element* 
     for (int i = 0; i < current->next.size(); i++) {
         
         if (i != 0) {
+            //i--;
+            //Si un élément a plusieurs next il faut reset les flags de ce chez qui on est déjà passé
+            
             if (current->next.size() > 0) {
-                set_flag_false(graph, current->next[i], i-1, true, flag, 0);
+                set_flag_false(graph, current->next[i-1], i-2, true, flag, 0);
             }
             current->flag = false;
+            
             cout << current->name << endl;
         }
         
         if (current->flag == true) {
+            
+            //si on est déjà passé par cette lettre il y a un circuit
+            
             cout << current->name << endl;
         
             cout << "Circuit détecté. " << endl;
@@ -319,6 +329,9 @@ int circuit (vector<element> &graph, element* first, element* current, element* 
             
             
         } else {
+            
+            //Si y'a pas de circuit
+            
             current->flag = true;
             //On met un flag pour signaler qu'on est déjà passé sur cet élément
             
@@ -349,6 +362,7 @@ int circuit (vector<element> &graph, element* first, element* current, element* 
             }
             
             cout << "." << endl;
+            
           
         }
     }
