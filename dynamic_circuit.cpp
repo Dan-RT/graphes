@@ -26,43 +26,62 @@ void fill_graph_dynamic (tt_contraintes* lesContraintes, vector<element*> &graph
     
 }
 
+
+void set_flag_false_dynamic (vector<element*> &graph_dynamic) {
+    
+    element* tmp = nullptr;
+    for(vector<element*>::iterator it = graph_dynamic.begin(); it != graph_dynamic.end(); ++it) {
+        tmp = *it;
+        tmp->flag = false;
+        if (tmp->next.size() > 0) {
+            for (int i = 0; i < tmp->next.size(); i++) {
+                tmp->next[i]->flag = false;
+            }
+        }
+    }
+    tmp = nullptr;
+    delete tmp;
+}
+
 void modify_element_dynamic (vector<element*> &graph_dynamic, tt_contraintes* lesContraintes, tt_graphe* leGraphe) {
     
     element* current = new element;
-    element* next = new element;
+    element* previous = new element;
 
-    //for (int ligne = 1; ligne <= leGraphe->nbSommets - 2; ligne++) {
+    for (int ligne = 1; ligne <= leGraphe->nbSommets - 2; ligne++) {
         //cout << "\nLETTRE DE BASE : " << lesContraintes->nomTaches[ligne] << endl;
-    for (int colonne = 1; colonne <= leGraphe->nbSommets - 2; colonne++) {
+    //for (int colonne = 1; colonne <= leGraphe->nbSommets - 2; colonne++) {
         for(vector<element*>::iterator it = graph_dynamic.begin(); it != graph_dynamic.end(); ++it) {
             
             current = *it;
             //cout << "Lettre testée : " << current->name << endl;
             
-            if (lesContraintes->nomTaches[colonne] == current->name) {
+            if (lesContraintes->nomTaches[ligne] == current->name) {
                 
-                //for (int colonne = 1; colonne <= leGraphe->nbSommets - 2; colonne++) {
-                for (int ligne = 1; ligne <= leGraphe->nbSommets - 2; ligne++) {
+                for (int colonne = 1; colonne <= leGraphe->nbSommets - 2; colonne++) {
+                //for (int ligne = 1; ligne <= leGraphe->nbSommets - 2; ligne++) {
                     if (leGraphe->adj[colonne][ligne] == 1) {
                         
                         for(vector<element*>::iterator it_2 = graph_dynamic.begin(); it_2 != graph_dynamic.end(); ++it_2) {
-                            next = *it_2;
+                            previous = *it_2;
                             
-                            if (lesContraintes->nomTaches[ligne] == next->name) {
+                            if (lesContraintes->nomTaches[colonne] == previous->name) {
                                 
-                                if (current->name == 'J') {
+                                if (current->name == 'C') {
                                     cout << "test" << endl;
                                 }
                                 
-                                cout << "\n" << current->name <<  " ne peut commencer que lorsque la tache " << next->name << " est terminee. " << endl;
+                                cout << "\n" << current->name <<  " ne peut commencer que lorsque la tache " << previous->name << " est terminee. " << endl;
                                 
-                                current->next.push_back(next);
-                                next->previous.push_back(current);
+                                previous->next.push_back(current);
+                                current->previous.push_back(previous);
+                                //current->next.push_back(current);
+                                //next->previous.push_back(next);
+                                
                                 display_graph_dynamic_content(graph_dynamic);
                                 if (reading_graph_dynamic(graph_dynamic) == 1) {
-                                    delete_circuit_dynamic(graph_dynamic, next->name, current->name);
+                                    delete_circuit_dynamic(graph_dynamic, previous->name, current->name);
                                 }
-                            
                                 
                                 display_graph_dynamic_content(graph_dynamic);
                             }
@@ -73,10 +92,10 @@ void modify_element_dynamic (vector<element*> &graph_dynamic, tt_contraintes* le
         }
     }
     
-    next = nullptr;
+    previous = nullptr;
     current = nullptr;
     
-    delete next;
+    delete previous;
     delete current;
     
     
@@ -93,7 +112,7 @@ void display_graph_dynamic_content (vector<element*> graph_dynamic) {
         
         current = *it;
         
-        cout << "Task : " << current->name << " - Duration : " << current->duration;
+        cout << "Flag " << current->flag << " - Task : " << current->name << " - Duration : " << current->duration;
         
         cout << " - Next : ";
         
@@ -197,22 +216,23 @@ void delete_circuit_dynamic (vector<element*> &graph_dynamic, char depart, char 
 int circuit (vector<element*> &graph_dynamic, element* first, element* current, element* previous, bool surface) {
     
     cout << current->name << endl;
-    int flag = 0;
     
     for (int i = 0; i < current->next.size(); i++) {
         
         //on regarde pour chaque next de l'élément testé
         
+        if (i > 0) {
+            current->flag = false;
+            //quand on change de next il faut veiller à bien remettre le flag à false
+        }
+        
         if (current->flag == true) {
             
             //si on est déjà passé par cette lettre il y a un circuit
-            
             cout << current->name << endl;
-            
             cout << "Circuit détecté. " << endl;
             
-            flag = 2;
-            break;
+            return 1;
         
         } else {
             
@@ -221,34 +241,14 @@ int circuit (vector<element*> &graph_dynamic, element* first, element* current, 
             current->flag = true;
             //On met un flag pour signaler qu'on est déjà passé sur cet élément
             
-            int check = circuit(graph_dynamic, first, current->next[i], current, false);
-            
-            //dès qu'on trouve un circuit on sort de la recherche
-            //vérifier ce que renvoie la fonction circuit permet de savoir si on doit supprimer l'arc ou non, si on fait pas gaffe et supprime tous les axes testés par réccurence
-            
-            if (check > 1) {
-                
-                flag = 1;
-                //delete_circuit(graph_dynamic, previous->name, current->name);
+            if (circuit(graph_dynamic, first, current->next[i], current, false) == 1) {
                 return 1;
-                
-            } else if (check == 1)  {
-                flag = 1;
-                break;
-            } else if (check == 0) {
-                current->flag = 0;
             }
             cout << "." << endl;
         }
     }
     
-    if (flag > 1) {
-        return flag;
-    } else if (flag == 1) {
-        return 1;
-    } else {
-        return 0;
-    }
+    return 0;
 }
 
 
@@ -269,7 +269,10 @@ int reading_graph_dynamic (vector<element*> &graph_dynamic) {
             first = nullptr;
             delete first;
             return 1;
+        } else {
+            set_flag_false_dynamic(graph_dynamic);
         }
+        
         
     }
     
