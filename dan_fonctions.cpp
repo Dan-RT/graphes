@@ -305,6 +305,7 @@ int circuit (vector<element> &graph, element* first, element* current, element* 
             
             if (current->next.size() > 0) {
                 set_flag_false(graph, current->next[i-1], i-2, true, flag, 0);
+                cout << "End of Set flag false.\n" << endl;
             }
             current->flag = false;
             
