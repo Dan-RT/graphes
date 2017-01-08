@@ -37,7 +37,7 @@ void display_graph_content (vector<element> graph);
 vector<element> modify_element (vector<element> graph, tt_contraintes* lesContraintes, tt_graphe* leGraphe, element* current, element* next);
 
 void free_memory (tt_contraintes* lesContraintes, tt_graphe* leGraphe, vector<element> graph, element* current, element* next);
-void reading_graph (vector<element> graph);
+void reading_graph (vector<element> &graph);
 int scan_graph (vector<element> graph, element* current);
 void rank_computation (vector<element> graph, map<char, element> &graph_back_up);
 void set_graph_cresc (map<char, element> graph_back_up, multimap<int, element> &graph_cresc);
